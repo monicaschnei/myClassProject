@@ -12,7 +12,7 @@ CREATE TABLE "professionalUser" (
   "phone_id" bigint UNIQUE NOT NULL,
   "professional_information_id" bigint UNIQUE NOT NULL,
   "updated_at" timestamp NOT NULL DEFAULT (now()),
-  "subjectMatter_id" integer UNIQUE NOT NULL UNIQUE,
+  "subjectMatter_id" integer UNIQUE NOT NULL,
   "subjectMatter_class_id" integer UNIQUE NOT NULL,
   "class_hour_price" varchar NOT NULL,
   "calendar_id" integer UNIQUE NOT NULL
@@ -79,14 +79,14 @@ CREATE TABLE "responsibleStudent" (
 
 CREATE TABLE "professionalInformation" (
   "id" bigserial PRIMARY KEY,
-  "experience_period" varchar,
-  "ocupation_area" varchar,
-  "university" varchar,
+  "experience_period" varchar NOT NULL,
+  "ocupation_area" varchar NOT NULL,
+  "university" varchar NOT NULL,
   "graduation_diploma" varchar NOT NULL,
-  "validate" boolean,
-  "graduation_country" varchar,
-  "graduation_city" varchar,
-  "graduation_state" varchar,
+  "validate" boolean NOT NULL,
+  "graduation_country" varchar NOT NULL,
+  "graduation_city" varchar NOT NULL,
+  "graduation_state" varchar NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT (now()),
   "updated_at" timestamp NOT NULL DEFAULT (now())
 );

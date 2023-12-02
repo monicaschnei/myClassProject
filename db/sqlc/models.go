@@ -30,17 +30,17 @@ type Phone struct {
 }
 
 type ProfessionalInformation struct {
-	ID                int64          `json:"id"`
-	ExperiencePeriod  sql.NullString `json:"experience_period"`
-	OcupationArea     sql.NullString `json:"ocupation_area"`
-	University        sql.NullString `json:"university"`
-	GraduationDiploma string         `json:"graduation_diploma"`
-	Validate          sql.NullBool   `json:"validate"`
-	GraduationCountry sql.NullString `json:"graduation_country"`
-	GraduationCity    sql.NullString `json:"graduation_city"`
-	GraduationState   sql.NullString `json:"graduation_state"`
-	CreatedAt         time.Time      `json:"created_at"`
-	UpdatedAt         time.Time      `json:"updated_at"`
+	ID                int64     `json:"id"`
+	ExperiencePeriod  string    `json:"experience_period"`
+	OcupationArea     string    `json:"ocupation_area"`
+	University        string    `json:"university"`
+	GraduationDiploma string    `json:"graduation_diploma"`
+	Validate          bool      `json:"validate"`
+	GraduationCountry string    `json:"graduation_country"`
+	GraduationCity    string    `json:"graduation_city"`
+	GraduationState   string    `json:"graduation_state"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 type ProfessionalUser struct {

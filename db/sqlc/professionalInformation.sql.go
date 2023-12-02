@@ -7,12 +7,12 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
 const createProfessionalInformation = `-- name: CreateProfessionalInformation :one
 INSERT INTO "professionalInformation" (
+  id,
   experience_period,
   ocupation_area,
   university,
@@ -23,25 +23,27 @@ INSERT INTO "professionalInformation" (
   graduation_state,
   updated_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 )
 RETURNING id, experience_period, ocupation_area, university, graduation_diploma, validate, graduation_country, graduation_city, graduation_state, created_at, updated_at
 `
 
 type CreateProfessionalInformationParams struct {
-	ExperiencePeriod  sql.NullString `json:"experience_period"`
-	OcupationArea     sql.NullString `json:"ocupation_area"`
-	University        sql.NullString `json:"university"`
-	GraduationDiploma string         `json:"graduation_diploma"`
-	Validate          sql.NullBool   `json:"validate"`
-	GraduationCountry sql.NullString `json:"graduation_country"`
-	GraduationCity    sql.NullString `json:"graduation_city"`
-	GraduationState   sql.NullString `json:"graduation_state"`
-	UpdatedAt         time.Time      `json:"updated_at"`
+	ID                int64     `json:"id"`
+	ExperiencePeriod  string    `json:"experience_period"`
+	OcupationArea     string    `json:"ocupation_area"`
+	University        string    `json:"university"`
+	GraduationDiploma string    `json:"graduation_diploma"`
+	Validate          bool      `json:"validate"`
+	GraduationCountry string    `json:"graduation_country"`
+	GraduationCity    string    `json:"graduation_city"`
+	GraduationState   string    `json:"graduation_state"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 func (q *Queries) CreateProfessionalInformation(ctx context.Context, arg CreateProfessionalInformationParams) (ProfessionalInformation, error) {
 	row := q.db.QueryRowContext(ctx, createProfessionalInformation,
+		arg.ID,
 		arg.ExperiencePeriod,
 		arg.OcupationArea,
 		arg.University,
@@ -180,15 +182,15 @@ RETURNING id, experience_period, ocupation_area, university, graduation_diploma,
 `
 
 type UpdateProfessionalInformationParams struct {
-	ID                int64          `json:"id"`
-	GraduationState   sql.NullString `json:"graduation_state"`
-	ExperiencePeriod  sql.NullString `json:"experience_period"`
-	OcupationArea     sql.NullString `json:"ocupation_area"`
-	University        sql.NullString `json:"university"`
-	GraduationDiploma string         `json:"graduation_diploma"`
-	Validate          sql.NullBool   `json:"validate"`
-	GraduationCountry sql.NullString `json:"graduation_country"`
-	GraduationCity    sql.NullString `json:"graduation_city"`
+	ID                int64  `json:"id"`
+	GraduationState   string `json:"graduation_state"`
+	ExperiencePeriod  string `json:"experience_period"`
+	OcupationArea     string `json:"ocupation_area"`
+	University        string `json:"university"`
+	GraduationDiploma string `json:"graduation_diploma"`
+	Validate          bool   `json:"validate"`
+	GraduationCountry string `json:"graduation_country"`
+	GraduationCity    string `json:"graduation_city"`
 }
 
 func (q *Queries) UpdateProfessionalInformation(ctx context.Context, arg UpdateProfessionalInformationParams) (ProfessionalInformation, error) {

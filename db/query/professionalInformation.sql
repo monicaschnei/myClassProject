@@ -1,5 +1,6 @@
 -- name: CreateProfessionalInformation :one
 INSERT INTO "professionalInformation" (
+  id,
   experience_period,
   ocupation_area,
   university,
@@ -10,7 +11,7 @@ INSERT INTO "professionalInformation" (
   graduation_state,
   updated_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 )
 RETURNING *;
 
