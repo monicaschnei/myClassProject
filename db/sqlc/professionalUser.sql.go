@@ -7,7 +7,7 @@ package db
 
 import (
 	"context"
-	"time"
+	"database/sql"
 )
 
 const createProfessionalUser = `-- name: CreateProfessionalUser :one
@@ -34,25 +34,25 @@ RETURNING id, created_at, name, username, password, gender, email, date_of_birth
 `
 
 type CreateProfessionalUserParams struct {
-	Name                      string    `json:"name"`
-	Username                  string    `json:"username"`
-	Password                  string    `json:"password"`
-	Gender                    string    `json:"gender"`
-	Email                     string    `json:"email"`
-	DateOfBirth               time.Time `json:"date_of_birth"`
-	Cpf                       int32     `json:"cpf"`
-	ImageID                   int64     `json:"image_id"`
-	PhoneID                   int64     `json:"phone_id"`
-	ProfessionalInformationID int64     `json:"professional_information_id"`
-	UpdatedAt                 time.Time `json:"updated_at"`
-	SubjectMatterID           int32     `json:"subjectMatter_id"`
-	SubjectMatterClassID      int32     `json:"subjectMatter_class_id"`
-	ClassHourPrice            string    `json:"class_hour_price"`
-	CalendarID                int32     `json:"calendar_id"`
+	Name                      sql.NullString `json:"name"`
+	Username                  sql.NullString `json:"username"`
+	Password                  sql.NullString `json:"password"`
+	Gender                    sql.NullString `json:"gender"`
+	Email                     sql.NullString `json:"email"`
+	DateOfBirth               sql.NullTime   `json:"date_of_birth"`
+	Cpf                       sql.NullInt32  `json:"cpf"`
+	ImageID                   sql.NullInt64  `json:"image_id"`
+	PhoneID                   sql.NullInt64  `json:"phone_id"`
+	ProfessionalInformationID sql.NullInt64  `json:"professional_information_id"`
+	UpdatedAt                 sql.NullTime   `json:"updated_at"`
+	SubjectMatterID           sql.NullInt32  `json:"subjectMatter_id"`
+	SubjectMatterClassID      sql.NullInt32  `json:"subjectMatter_class_id"`
+	ClassHourPrice            sql.NullString `json:"class_hour_price"`
+	CalendarID                sql.NullInt32  `json:"calendar_id"`
 }
 
 func (q *Queries) CreateProfessionalUser(ctx context.Context, arg CreateProfessionalUserParams) (ProfessionalUser, error) {
-	row := q.db.QueryRowContext(ctx, createProfessionalUser,
+	row := q.queryRow(ctx, q.createProfessionalUserStmt, createProfessionalUser,
 		arg.Name,
 		arg.Username,
 		arg.Password,
@@ -99,7 +99,7 @@ RETURNING id, created_at, name, username, password, gender, email, date_of_birth
 `
 
 func (q *Queries) DeleteProfessionalUser(ctx context.Context, id int64) (ProfessionalUser, error) {
-	row := q.db.QueryRowContext(ctx, deleteProfessionalUser, id)
+	row := q.queryRow(ctx, q.deleteProfessionalUserStmt, deleteProfessionalUser, id)
 	var i ProfessionalUser
 	err := row.Scan(
 		&i.ID,
@@ -129,7 +129,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetProfessionalUser(ctx context.Context, id int64) (ProfessionalUser, error) {
-	row := q.db.QueryRowContext(ctx, getProfessionalUser, id)
+	row := q.queryRow(ctx, q.getProfessionalUserStmt, getProfessionalUser, id)
 	var i ProfessionalUser
 	err := row.Scan(
 		&i.ID,
@@ -166,7 +166,7 @@ type ListProfessionalUserParams struct {
 }
 
 func (q *Queries) ListProfessionalUser(ctx context.Context, arg ListProfessionalUserParams) ([]ProfessionalUser, error) {
-	rows, err := q.db.QueryContext(ctx, listProfessionalUser, arg.Limit, arg.Offset)
+	rows, err := q.query(ctx, q.listProfessionalUserStmt, listProfessionalUser, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -219,17 +219,17 @@ RETURNING id, created_at, name, username, password, gender, email, date_of_birth
 `
 
 type UpdateProfessionalUserParams struct {
-	ID             int64     `json:"id"`
-	Name           string    `json:"name"`
-	Username       string    `json:"username"`
-	Password       string    `json:"password"`
-	Email          string    `json:"email"`
-	DateOfBirth    time.Time `json:"date_of_birth"`
-	ClassHourPrice string    `json:"class_hour_price"`
+	ID             int64          `json:"id"`
+	Name           sql.NullString `json:"name"`
+	Username       sql.NullString `json:"username"`
+	Password       sql.NullString `json:"password"`
+	Email          sql.NullString `json:"email"`
+	DateOfBirth    sql.NullTime   `json:"date_of_birth"`
+	ClassHourPrice sql.NullString `json:"class_hour_price"`
 }
 
 func (q *Queries) UpdateProfessionalUser(ctx context.Context, arg UpdateProfessionalUserParams) (ProfessionalUser, error) {
-	row := q.db.QueryRowContext(ctx, updateProfessionalUser,
+	row := q.queryRow(ctx, q.updateProfessionalUserStmt, updateProfessionalUser,
 		arg.ID,
 		arg.Name,
 		arg.Username,

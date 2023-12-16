@@ -7,7 +7,7 @@ package db
 
 import (
 	"context"
-	"time"
+	"database/sql"
 )
 
 const createPhone = `-- name: CreatePhone :one
@@ -24,15 +24,15 @@ RETURNING id, country_code, area_core, number, type, created_at, updated_at
 `
 
 type CreatePhoneParams struct {
-	CountryCode int32     `json:"country_code"`
-	AreaCore    int32     `json:"area_core"`
-	Number      int32     `json:"number"`
-	Type        string    `json:"type"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	CountryCode sql.NullInt32  `json:"country_code"`
+	AreaCore    sql.NullInt32  `json:"area_core"`
+	Number      sql.NullInt32  `json:"number"`
+	Type        sql.NullString `json:"type"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
 }
 
 func (q *Queries) CreatePhone(ctx context.Context, arg CreatePhoneParams) (Phone, error) {
-	row := q.db.QueryRowContext(ctx, createPhone,
+	row := q.queryRow(ctx, q.createPhoneStmt, createPhone,
 		arg.CountryCode,
 		arg.AreaCore,
 		arg.Number,
@@ -59,7 +59,7 @@ RETURNING id, country_code, area_core, number, type, created_at, updated_at
 `
 
 func (q *Queries) DeletePhone(ctx context.Context, id int64) (Phone, error) {
-	row := q.db.QueryRowContext(ctx, deletePhone, id)
+	row := q.queryRow(ctx, q.deletePhoneStmt, deletePhone, id)
 	var i Phone
 	err := row.Scan(
 		&i.ID,
@@ -79,7 +79,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetPhone(ctx context.Context, id int64) (Phone, error) {
-	row := q.db.QueryRowContext(ctx, getPhone, id)
+	row := q.queryRow(ctx, q.getPhoneStmt, getPhone, id)
 	var i Phone
 	err := row.Scan(
 		&i.ID,
@@ -106,7 +106,7 @@ type ListPhoneParams struct {
 }
 
 func (q *Queries) ListPhone(ctx context.Context, arg ListPhoneParams) ([]Phone, error) {
-	rows, err := q.db.QueryContext(ctx, listPhone, arg.Limit, arg.Offset)
+	rows, err := q.query(ctx, q.listPhoneStmt, listPhone, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -147,15 +147,15 @@ RETURNING id, country_code, area_core, number, type, created_at, updated_at
 `
 
 type UpdatePhoneParams struct {
-	ID          int64  `json:"id"`
-	CountryCode int32  `json:"country_code"`
-	AreaCore    int32  `json:"area_core"`
-	Number      int32  `json:"number"`
-	Type        string `json:"type"`
+	ID          int64          `json:"id"`
+	CountryCode sql.NullInt32  `json:"country_code"`
+	AreaCore    sql.NullInt32  `json:"area_core"`
+	Number      sql.NullInt32  `json:"number"`
+	Type        sql.NullString `json:"type"`
 }
 
 func (q *Queries) UpdatePhone(ctx context.Context, arg UpdatePhoneParams) (Phone, error) {
-	row := q.db.QueryRowContext(ctx, updatePhone,
+	row := q.queryRow(ctx, q.updatePhoneStmt, updatePhone,
 		arg.ID,
 		arg.CountryCode,
 		arg.AreaCore,

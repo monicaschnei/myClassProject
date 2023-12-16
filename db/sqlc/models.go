@@ -6,61 +6,60 @@ package db
 
 import (
 	"database/sql"
-	"time"
 )
 
 type Calendar struct {
-	ID                 int64        `json:"id"`
-	SubjectMatterID    int32        `json:"subjectMatter_id"`
-	Time               sql.NullTime `json:"time"`
-	Date               sql.NullTime `json:"date"`
-	Available          sql.NullBool `json:"available"`
-	FilledStudentID    int32        `json:"filled_student_id"`
-	ProfessionalUserID int32        `json:"professionalUser_id"`
+	ID                 int64         `json:"id"`
+	SubjectMatterID    sql.NullInt32 `json:"subjectMatter_id"`
+	Time               sql.NullTime  `json:"time"`
+	Date               sql.NullTime  `json:"date"`
+	Available          sql.NullBool  `json:"available"`
+	FilledStudentID    sql.NullInt32 `json:"filled_student_id"`
+	ProfessionalUserID sql.NullInt32 `json:"professionalUser_id"`
 }
 
 type Phone struct {
-	ID          int64     `json:"id"`
-	CountryCode int32     `json:"country_code"`
-	AreaCore    int32     `json:"area_core"`
-	Number      int32     `json:"number"`
-	Type        string    `json:"type"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          int64          `json:"id"`
+	CountryCode sql.NullInt32  `json:"country_code"`
+	AreaCore    sql.NullInt32  `json:"area_core"`
+	Number      sql.NullInt32  `json:"number"`
+	Type        sql.NullString `json:"type"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
 }
 
 type ProfessionalInformation struct {
-	ID                int64     `json:"id"`
-	ExperiencePeriod  string    `json:"experience_period"`
-	OcupationArea     string    `json:"ocupation_area"`
-	University        string    `json:"university"`
-	GraduationDiploma string    `json:"graduation_diploma"`
-	Validate          bool      `json:"validate"`
-	GraduationCountry string    `json:"graduation_country"`
-	GraduationCity    string    `json:"graduation_city"`
-	GraduationState   string    `json:"graduation_state"`
-	CreatedAt         time.Time `json:"created_at"`
-	UpdatedAt         time.Time `json:"updated_at"`
+	ID                int64          `json:"id"`
+	ExperiencePeriod  sql.NullString `json:"experience_period"`
+	OcupationArea     sql.NullString `json:"ocupation_area"`
+	University        sql.NullString `json:"university"`
+	GraduationDiploma sql.NullString `json:"graduation_diploma"`
+	Validate          sql.NullBool   `json:"validate"`
+	GraduationCountry sql.NullString `json:"graduation_country"`
+	GraduationCity    sql.NullString `json:"graduation_city"`
+	GraduationState   sql.NullString `json:"graduation_state"`
+	CreatedAt         sql.NullTime   `json:"created_at"`
+	UpdatedAt         sql.NullTime   `json:"updated_at"`
 }
 
 type ProfessionalUser struct {
-	ID                        int64     `json:"id"`
-	CreatedAt                 time.Time `json:"created_at"`
-	Name                      string    `json:"name"`
-	Username                  string    `json:"username"`
-	Password                  string    `json:"password"`
-	Gender                    string    `json:"gender"`
-	Email                     string    `json:"email"`
-	DateOfBirth               time.Time `json:"date_of_birth"`
-	Cpf                       int32     `json:"cpf"`
-	ImageID                   int64     `json:"image_id"`
-	PhoneID                   int64     `json:"phone_id"`
-	ProfessionalInformationID int64     `json:"professional_information_id"`
-	UpdatedAt                 time.Time `json:"updated_at"`
-	SubjectMatterID           int32     `json:"subjectMatter_id"`
-	SubjectMatterClassID      int32     `json:"subjectMatter_class_id"`
-	ClassHourPrice            string    `json:"class_hour_price"`
-	CalendarID                int32     `json:"calendar_id"`
+	ID                        int64          `json:"id"`
+	CreatedAt                 sql.NullTime   `json:"created_at"`
+	Name                      sql.NullString `json:"name"`
+	Username                  sql.NullString `json:"username"`
+	Password                  sql.NullString `json:"password"`
+	Gender                    sql.NullString `json:"gender"`
+	Email                     sql.NullString `json:"email"`
+	DateOfBirth               sql.NullTime   `json:"date_of_birth"`
+	Cpf                       sql.NullInt32  `json:"cpf"`
+	ImageID                   sql.NullInt64  `json:"image_id"`
+	PhoneID                   sql.NullInt64  `json:"phone_id"`
+	ProfessionalInformationID sql.NullInt64  `json:"professional_information_id"`
+	UpdatedAt                 sql.NullTime   `json:"updated_at"`
+	SubjectMatterID           sql.NullInt32  `json:"subjectMatter_id"`
+	SubjectMatterClassID      sql.NullInt32  `json:"subjectMatter_class_id"`
+	ClassHourPrice            sql.NullString `json:"class_hour_price"`
+	CalendarID                sql.NullInt32  `json:"calendar_id"`
 }
 
 type ProfessionalUserSubjectMatter struct {
@@ -69,36 +68,36 @@ type ProfessionalUserSubjectMatter struct {
 }
 
 type ResponsibleStudent struct {
-	ID          int64     `json:"id"`
-	Name        string    `json:"name"`
-	Gender      string    `json:"gender"`
-	Email       string    `json:"email"`
-	DateOfBirth time.Time `json:"date_of_birth"`
-	Cpf         int32     `json:"cpf"`
-	PhoneID     int64     `json:"phone_id"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          int64          `json:"id"`
+	Name        sql.NullString `json:"name"`
+	Gender      sql.NullString `json:"gender"`
+	Email       sql.NullString `json:"email"`
+	DateOfBirth sql.NullTime   `json:"date_of_birth"`
+	Cpf         sql.NullInt32  `json:"cpf"`
+	PhoneID     sql.NullInt64  `json:"phone_id"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
 }
 
 type StudentUser struct {
 	ID                   int64          `json:"id"`
-	Username             string         `json:"username"`
-	Password             string         `json:"password"`
+	Username             sql.NullString `json:"username"`
+	Password             sql.NullString `json:"password"`
 	Name                 sql.NullString `json:"name"`
-	DateOfBirth          time.Time      `json:"date_of_birth"`
+	DateOfBirth          sql.NullTime   `json:"date_of_birth"`
 	Gender               sql.NullString `json:"gender"`
-	CreatedAt            time.Time      `json:"created_at"`
-	ResponsibleStudentID int32          `json:"responsible_student_id"`
-	UpdatedAt            time.Time      `json:"updated_at"`
-	SubjectMatterClassID int32          `json:"subjectMatter_class_id"`
-	CalendarID           int32          `json:"calendar_id"`
+	CreatedAt            sql.NullTime   `json:"created_at"`
+	ResponsibleStudentID sql.NullInt32  `json:"responsible_student_id"`
+	UpdatedAt            sql.NullTime   `json:"updated_at"`
+	SubjectMatterClassID sql.NullInt32  `json:"subjectMatter_class_id"`
+	CalendarID           sql.NullInt32  `json:"calendar_id"`
 }
 
 type SubjectMatter struct {
 	ID        int64          `json:"id"`
-	Title     string         `json:"title"`
-	CreatedAt time.Time      `json:"created_at"`
-	Category  string         `json:"category"`
+	Title     sql.NullString `json:"title"`
+	CreatedAt sql.NullTime   `json:"created_at"`
+	Category  sql.NullString `json:"category"`
 	Abstract  sql.NullString `json:"abstract"`
 }
 
@@ -109,12 +108,12 @@ type SubjectMatterCalendar struct {
 
 type SubjectMatterClass struct {
 	ID                 int64          `json:"id"`
-	CreatedAt          time.Time      `json:"created_at"`
-	SubjectMatterID    int32          `json:"subjectMatter_id"`
-	ProfessionalID     int32          `json:"professional_id"`
-	Durantion          int32          `json:"durantion"`
-	EnrollmentDate     time.Time      `json:"enrollment_date"`
-	EnrollmentTime     time.Time      `json:"enrollment_time"`
+	CreatedAt          sql.NullTime   `json:"created_at"`
+	SubjectMatterID    sql.NullInt32  `json:"subjectMatter_id"`
+	ProfessionalID     sql.NullInt32  `json:"professional_id"`
+	Durantion          sql.NullInt32  `json:"durantion"`
+	EnrollmentDate     sql.NullTime   `json:"enrollment_date"`
+	EnrollmentTime     sql.NullTime   `json:"enrollment_time"`
 	Cancellation       sql.NullBool   `json:"cancellation"`
 	CancellationReason sql.NullString `json:"cancellation_reason"`
 	StudentAttendence  sql.NullBool   `json:"student_attendence"`

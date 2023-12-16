@@ -22,13 +22,13 @@ RETURNING id, title, created_at, category, abstract
 `
 
 type CreateSubjectMatterParams struct {
-	Title    string         `json:"title"`
-	Category string         `json:"category"`
+	Title    sql.NullString `json:"title"`
+	Category sql.NullString `json:"category"`
 	Abstract sql.NullString `json:"abstract"`
 }
 
 func (q *Queries) CreateSubjectMatter(ctx context.Context, arg CreateSubjectMatterParams) (SubjectMatter, error) {
-	row := q.db.QueryRowContext(ctx, createSubjectMatter, arg.Title, arg.Category, arg.Abstract)
+	row := q.queryRow(ctx, q.createSubjectMatterStmt, createSubjectMatter, arg.Title, arg.Category, arg.Abstract)
 	var i SubjectMatter
 	err := row.Scan(
 		&i.ID,
@@ -47,7 +47,7 @@ RETURNING id, title, created_at, category, abstract
 `
 
 func (q *Queries) DeleteSubjectMatter(ctx context.Context, id int64) (SubjectMatter, error) {
-	row := q.db.QueryRowContext(ctx, deleteSubjectMatter, id)
+	row := q.queryRow(ctx, q.deleteSubjectMatterStmt, deleteSubjectMatter, id)
 	var i SubjectMatter
 	err := row.Scan(
 		&i.ID,
@@ -65,7 +65,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetSubjectMatter(ctx context.Context, id int64) (SubjectMatter, error) {
-	row := q.db.QueryRowContext(ctx, getSubjectMatter, id)
+	row := q.queryRow(ctx, q.getSubjectMatterStmt, getSubjectMatter, id)
 	var i SubjectMatter
 	err := row.Scan(
 		&i.ID,
@@ -90,7 +90,7 @@ type ListSubjectMatterParams struct {
 }
 
 func (q *Queries) ListSubjectMatter(ctx context.Context, arg ListSubjectMatterParams) ([]SubjectMatter, error) {
-	rows, err := q.db.QueryContext(ctx, listSubjectMatter, arg.Limit, arg.Offset)
+	rows, err := q.query(ctx, q.listSubjectMatterStmt, listSubjectMatter, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -129,13 +129,13 @@ RETURNING id, title, created_at, category, abstract
 
 type UpdateSubjectMatterParams struct {
 	ID       int64          `json:"id"`
-	Title    string         `json:"title"`
-	Category string         `json:"category"`
+	Title    sql.NullString `json:"title"`
+	Category sql.NullString `json:"category"`
 	Abstract sql.NullString `json:"abstract"`
 }
 
 func (q *Queries) UpdateSubjectMatter(ctx context.Context, arg UpdateSubjectMatterParams) (SubjectMatter, error) {
-	row := q.db.QueryRowContext(ctx, updateSubjectMatter,
+	row := q.queryRow(ctx, q.updateSubjectMatterStmt, updateSubjectMatter,
 		arg.ID,
 		arg.Title,
 		arg.Category,

@@ -8,7 +8,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"time"
 )
 
 const createSubjectMatterClass = `-- name: CreateSubjectMatterClass :one
@@ -30,11 +29,11 @@ RETURNING id, created_at, "subjectMatter_id", professional_id, durantion, enroll
 `
 
 type CreateSubjectMatterClassParams struct {
-	SubjectMatterID    int32          `json:"subjectMatter_id"`
-	ProfessionalID     int32          `json:"professional_id"`
-	Durantion          int32          `json:"durantion"`
-	EnrollmentDate     time.Time      `json:"enrollment_date"`
-	EnrollmentTime     time.Time      `json:"enrollment_time"`
+	SubjectMatterID    sql.NullInt32  `json:"subjectMatter_id"`
+	ProfessionalID     sql.NullInt32  `json:"professional_id"`
+	Durantion          sql.NullInt32  `json:"durantion"`
+	EnrollmentDate     sql.NullTime   `json:"enrollment_date"`
+	EnrollmentTime     sql.NullTime   `json:"enrollment_time"`
 	Cancellation       sql.NullBool   `json:"cancellation"`
 	CancellationReason sql.NullString `json:"cancellation_reason"`
 	StudentAttendence  sql.NullBool   `json:"student_attendence"`
@@ -43,7 +42,7 @@ type CreateSubjectMatterClassParams struct {
 }
 
 func (q *Queries) CreateSubjectMatterClass(ctx context.Context, arg CreateSubjectMatterClassParams) (SubjectMatterClass, error) {
-	row := q.db.QueryRowContext(ctx, createSubjectMatterClass,
+	row := q.queryRow(ctx, q.createSubjectMatterClassStmt, createSubjectMatterClass,
 		arg.SubjectMatterID,
 		arg.ProfessionalID,
 		arg.Durantion,
@@ -80,7 +79,7 @@ RETURNING id, created_at, "subjectMatter_id", professional_id, durantion, enroll
 `
 
 func (q *Queries) DeleteSubjectMatterClass(ctx context.Context, id int64) (SubjectMatterClass, error) {
-	row := q.db.QueryRowContext(ctx, deleteSubjectMatterClass, id)
+	row := q.queryRow(ctx, q.deleteSubjectMatterClassStmt, deleteSubjectMatterClass, id)
 	var i SubjectMatterClass
 	err := row.Scan(
 		&i.ID,
@@ -105,7 +104,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetSubjectMatterClass(ctx context.Context, id int64) (SubjectMatterClass, error) {
-	row := q.db.QueryRowContext(ctx, getSubjectMatterClass, id)
+	row := q.queryRow(ctx, q.getSubjectMatterClassStmt, getSubjectMatterClass, id)
 	var i SubjectMatterClass
 	err := row.Scan(
 		&i.ID,
@@ -137,7 +136,7 @@ type ListSubjectMatterClassParams struct {
 }
 
 func (q *Queries) ListSubjectMatterClass(ctx context.Context, arg ListSubjectMatterClassParams) ([]SubjectMatterClass, error) {
-	rows, err := q.db.QueryContext(ctx, listSubjectMatterClass, arg.Limit, arg.Offset)
+	rows, err := q.query(ctx, q.listSubjectMatterClassStmt, listSubjectMatterClass, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -185,15 +184,15 @@ RETURNING id, created_at, "subjectMatter_id", professional_id, durantion, enroll
 
 type UpdateSubjectMatterClassParams struct {
 	ID             int64          `json:"id"`
-	Durantion      int32          `json:"durantion"`
-	EnrollmentDate time.Time      `json:"enrollment_date"`
-	EnrollmentTime time.Time      `json:"enrollment_time"`
+	Durantion      sql.NullInt32  `json:"durantion"`
+	EnrollmentDate sql.NullTime   `json:"enrollment_date"`
+	EnrollmentTime sql.NullTime   `json:"enrollment_time"`
 	StudyMaterial  sql.NullString `json:"study_material"`
 	TestingExam    sql.NullString `json:"testing_exam"`
 }
 
 func (q *Queries) UpdateSubjectMatterClass(ctx context.Context, arg UpdateSubjectMatterClassParams) (SubjectMatterClass, error) {
-	row := q.db.QueryRowContext(ctx, updateSubjectMatterClass,
+	row := q.queryRow(ctx, q.updateSubjectMatterClassStmt, updateSubjectMatterClass,
 		arg.ID,
 		arg.Durantion,
 		arg.EnrollmentDate,

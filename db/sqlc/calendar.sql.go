@@ -25,16 +25,16 @@ RETURNING id, "subjectMatter_id", time, date, available, filled_student_id, "pro
 `
 
 type CreateCalendarParams struct {
-	SubjectMatterID    int32        `json:"subjectMatter_id"`
-	Time               sql.NullTime `json:"time"`
-	Date               sql.NullTime `json:"date"`
-	Available          sql.NullBool `json:"available"`
-	FilledStudentID    int32        `json:"filled_student_id"`
-	ProfessionalUserID int32        `json:"professionalUser_id"`
+	SubjectMatterID    sql.NullInt32 `json:"subjectMatter_id"`
+	Time               sql.NullTime  `json:"time"`
+	Date               sql.NullTime  `json:"date"`
+	Available          sql.NullBool  `json:"available"`
+	FilledStudentID    sql.NullInt32 `json:"filled_student_id"`
+	ProfessionalUserID sql.NullInt32 `json:"professionalUser_id"`
 }
 
 func (q *Queries) CreateCalendar(ctx context.Context, arg CreateCalendarParams) (Calendar, error) {
-	row := q.db.QueryRowContext(ctx, createCalendar,
+	row := q.queryRow(ctx, q.createCalendarStmt, createCalendar,
 		arg.SubjectMatterID,
 		arg.Time,
 		arg.Date,
@@ -62,7 +62,7 @@ RETURNING id, "subjectMatter_id", time, date, available, filled_student_id, "pro
 `
 
 func (q *Queries) DeleteCalendar(ctx context.Context, id int64) (Calendar, error) {
-	row := q.db.QueryRowContext(ctx, deleteCalendar, id)
+	row := q.queryRow(ctx, q.deleteCalendarStmt, deleteCalendar, id)
 	var i Calendar
 	err := row.Scan(
 		&i.ID,
@@ -82,7 +82,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetCalendar(ctx context.Context, id int64) (Calendar, error) {
-	row := q.db.QueryRowContext(ctx, getCalendar, id)
+	row := q.queryRow(ctx, q.getCalendarStmt, getCalendar, id)
 	var i Calendar
 	err := row.Scan(
 		&i.ID,
@@ -109,7 +109,7 @@ type ListCalendarParams struct {
 }
 
 func (q *Queries) ListCalendar(ctx context.Context, arg ListCalendarParams) ([]Calendar, error) {
-	rows, err := q.db.QueryContext(ctx, listCalendar, arg.Limit, arg.Offset)
+	rows, err := q.query(ctx, q.listCalendarStmt, listCalendar, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ type UpdateCalendarParams struct {
 }
 
 func (q *Queries) UpdateCalendar(ctx context.Context, arg UpdateCalendarParams) (Calendar, error) {
-	row := q.db.QueryRowContext(ctx, updateCalendar,
+	row := q.queryRow(ctx, q.updateCalendarStmt, updateCalendar,
 		arg.ID,
 		arg.Time,
 		arg.Date,

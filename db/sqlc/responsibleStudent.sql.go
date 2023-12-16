@@ -7,7 +7,7 @@ package db
 
 import (
 	"context"
-	"time"
+	"database/sql"
 )
 
 const createResponsibleStudent = `-- name: CreateResponsibleStudent :one
@@ -26,17 +26,17 @@ RETURNING id, name, gender, email, date_of_birth, cpf, phone_id, created_at, upd
 `
 
 type CreateResponsibleStudentParams struct {
-	Name        string    `json:"name"`
-	Gender      string    `json:"gender"`
-	Email       string    `json:"email"`
-	DateOfBirth time.Time `json:"date_of_birth"`
-	Cpf         int32     `json:"cpf"`
-	PhoneID     int64     `json:"phone_id"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	Name        sql.NullString `json:"name"`
+	Gender      sql.NullString `json:"gender"`
+	Email       sql.NullString `json:"email"`
+	DateOfBirth sql.NullTime   `json:"date_of_birth"`
+	Cpf         sql.NullInt32  `json:"cpf"`
+	PhoneID     sql.NullInt64  `json:"phone_id"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
 }
 
 func (q *Queries) CreateResponsibleStudent(ctx context.Context, arg CreateResponsibleStudentParams) (ResponsibleStudent, error) {
-	row := q.db.QueryRowContext(ctx, createResponsibleStudent,
+	row := q.queryRow(ctx, q.createResponsibleStudentStmt, createResponsibleStudent,
 		arg.Name,
 		arg.Gender,
 		arg.Email,
@@ -67,7 +67,7 @@ RETURNING id, name, gender, email, date_of_birth, cpf, phone_id, created_at, upd
 `
 
 func (q *Queries) DeleteResponsibleStudent(ctx context.Context, id int64) (ResponsibleStudent, error) {
-	row := q.db.QueryRowContext(ctx, deleteResponsibleStudent, id)
+	row := q.queryRow(ctx, q.deleteResponsibleStudentStmt, deleteResponsibleStudent, id)
 	var i ResponsibleStudent
 	err := row.Scan(
 		&i.ID,
@@ -89,7 +89,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetResponsibleStudent(ctx context.Context, id int64) (ResponsibleStudent, error) {
-	row := q.db.QueryRowContext(ctx, getResponsibleStudent, id)
+	row := q.queryRow(ctx, q.getResponsibleStudentStmt, getResponsibleStudent, id)
 	var i ResponsibleStudent
 	err := row.Scan(
 		&i.ID,
@@ -118,7 +118,7 @@ type ListResponsibleStudentParams struct {
 }
 
 func (q *Queries) ListResponsibleStudent(ctx context.Context, arg ListResponsibleStudentParams) ([]ResponsibleStudent, error) {
-	rows, err := q.db.QueryContext(ctx, listResponsibleStudent, arg.Limit, arg.Offset)
+	rows, err := q.query(ctx, q.listResponsibleStudentStmt, listResponsibleStudent, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -159,13 +159,13 @@ RETURNING id, name, gender, email, date_of_birth, cpf, phone_id, created_at, upd
 `
 
 type UpdateResponsibleStudentParams struct {
-	ID    int64  `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	ID    int64          `json:"id"`
+	Name  sql.NullString `json:"name"`
+	Email sql.NullString `json:"email"`
 }
 
 func (q *Queries) UpdateResponsibleStudent(ctx context.Context, arg UpdateResponsibleStudentParams) (ResponsibleStudent, error) {
-	row := q.db.QueryRowContext(ctx, updateResponsibleStudent, arg.ID, arg.Name, arg.Email)
+	row := q.queryRow(ctx, q.updateResponsibleStudentStmt, updateResponsibleStudent, arg.ID, arg.Name, arg.Email)
 	var i ResponsibleStudent
 	err := row.Scan(
 		&i.ID,

@@ -7,7 +7,7 @@ package db
 
 import (
 	"context"
-	"time"
+	"database/sql"
 )
 
 const createProfessionalInformation = `-- name: CreateProfessionalInformation :one
@@ -29,20 +29,20 @@ RETURNING id, experience_period, ocupation_area, university, graduation_diploma,
 `
 
 type CreateProfessionalInformationParams struct {
-	ID                int64     `json:"id"`
-	ExperiencePeriod  string    `json:"experience_period"`
-	OcupationArea     string    `json:"ocupation_area"`
-	University        string    `json:"university"`
-	GraduationDiploma string    `json:"graduation_diploma"`
-	Validate          bool      `json:"validate"`
-	GraduationCountry string    `json:"graduation_country"`
-	GraduationCity    string    `json:"graduation_city"`
-	GraduationState   string    `json:"graduation_state"`
-	UpdatedAt         time.Time `json:"updated_at"`
+	ID                int64          `json:"id"`
+	ExperiencePeriod  sql.NullString `json:"experience_period"`
+	OcupationArea     sql.NullString `json:"ocupation_area"`
+	University        sql.NullString `json:"university"`
+	GraduationDiploma sql.NullString `json:"graduation_diploma"`
+	Validate          sql.NullBool   `json:"validate"`
+	GraduationCountry sql.NullString `json:"graduation_country"`
+	GraduationCity    sql.NullString `json:"graduation_city"`
+	GraduationState   sql.NullString `json:"graduation_state"`
+	UpdatedAt         sql.NullTime   `json:"updated_at"`
 }
 
 func (q *Queries) CreateProfessionalInformation(ctx context.Context, arg CreateProfessionalInformationParams) (ProfessionalInformation, error) {
-	row := q.db.QueryRowContext(ctx, createProfessionalInformation,
+	row := q.queryRow(ctx, q.createProfessionalInformationStmt, createProfessionalInformation,
 		arg.ID,
 		arg.ExperiencePeriod,
 		arg.OcupationArea,
@@ -78,7 +78,7 @@ RETURNING id, experience_period, ocupation_area, university, graduation_diploma,
 `
 
 func (q *Queries) DeleteProfessionalInformation(ctx context.Context, id int64) (ProfessionalInformation, error) {
-	row := q.db.QueryRowContext(ctx, deleteProfessionalInformation, id)
+	row := q.queryRow(ctx, q.deleteProfessionalInformationStmt, deleteProfessionalInformation, id)
 	var i ProfessionalInformation
 	err := row.Scan(
 		&i.ID,
@@ -102,7 +102,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetProfessionalInformation(ctx context.Context, id int64) (ProfessionalInformation, error) {
-	row := q.db.QueryRowContext(ctx, getProfessionalInformation, id)
+	row := q.queryRow(ctx, q.getProfessionalInformationStmt, getProfessionalInformation, id)
 	var i ProfessionalInformation
 	err := row.Scan(
 		&i.ID,
@@ -133,7 +133,7 @@ type ListProfessionalInformationParams struct {
 }
 
 func (q *Queries) ListProfessionalInformation(ctx context.Context, arg ListProfessionalInformationParams) ([]ProfessionalInformation, error) {
-	rows, err := q.db.QueryContext(ctx, listProfessionalInformation, arg.Limit, arg.Offset)
+	rows, err := q.query(ctx, q.listProfessionalInformationStmt, listProfessionalInformation, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -182,19 +182,19 @@ RETURNING id, experience_period, ocupation_area, university, graduation_diploma,
 `
 
 type UpdateProfessionalInformationParams struct {
-	ID                int64  `json:"id"`
-	GraduationState   string `json:"graduation_state"`
-	ExperiencePeriod  string `json:"experience_period"`
-	OcupationArea     string `json:"ocupation_area"`
-	University        string `json:"university"`
-	GraduationDiploma string `json:"graduation_diploma"`
-	Validate          bool   `json:"validate"`
-	GraduationCountry string `json:"graduation_country"`
-	GraduationCity    string `json:"graduation_city"`
+	ID                int64          `json:"id"`
+	GraduationState   sql.NullString `json:"graduation_state"`
+	ExperiencePeriod  sql.NullString `json:"experience_period"`
+	OcupationArea     sql.NullString `json:"ocupation_area"`
+	University        sql.NullString `json:"university"`
+	GraduationDiploma sql.NullString `json:"graduation_diploma"`
+	Validate          sql.NullBool   `json:"validate"`
+	GraduationCountry sql.NullString `json:"graduation_country"`
+	GraduationCity    sql.NullString `json:"graduation_city"`
 }
 
 func (q *Queries) UpdateProfessionalInformation(ctx context.Context, arg UpdateProfessionalInformationParams) (ProfessionalInformation, error) {
-	row := q.db.QueryRowContext(ctx, updateProfessionalInformation,
+	row := q.queryRow(ctx, q.updateProfessionalInformationStmt, updateProfessionalInformation,
 		arg.ID,
 		arg.GraduationState,
 		arg.ExperiencePeriod,

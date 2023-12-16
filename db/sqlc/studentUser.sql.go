@@ -8,7 +8,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"time"
 )
 
 const createStudentUser = `-- name: CreateStudentUser :one
@@ -29,19 +28,19 @@ RETURNING id, username, password, name, date_of_birth, gender, created_at, respo
 `
 
 type CreateStudentUserParams struct {
-	Username             string         `json:"username"`
-	Password             string         `json:"password"`
+	Username             sql.NullString `json:"username"`
+	Password             sql.NullString `json:"password"`
 	Name                 sql.NullString `json:"name"`
-	DateOfBirth          time.Time      `json:"date_of_birth"`
+	DateOfBirth          sql.NullTime   `json:"date_of_birth"`
 	Gender               sql.NullString `json:"gender"`
-	ResponsibleStudentID int32          `json:"responsible_student_id"`
-	UpdatedAt            time.Time      `json:"updated_at"`
-	SubjectMatterClassID int32          `json:"subjectMatter_class_id"`
-	CalendarID           int32          `json:"calendar_id"`
+	ResponsibleStudentID sql.NullInt32  `json:"responsible_student_id"`
+	UpdatedAt            sql.NullTime   `json:"updated_at"`
+	SubjectMatterClassID sql.NullInt32  `json:"subjectMatter_class_id"`
+	CalendarID           sql.NullInt32  `json:"calendar_id"`
 }
 
 func (q *Queries) CreateStudentUser(ctx context.Context, arg CreateStudentUserParams) (StudentUser, error) {
-	row := q.db.QueryRowContext(ctx, createStudentUser,
+	row := q.queryRow(ctx, q.createStudentUserStmt, createStudentUser,
 		arg.Username,
 		arg.Password,
 		arg.Name,
@@ -76,7 +75,7 @@ RETURNING id, username, password, name, date_of_birth, gender, created_at, respo
 `
 
 func (q *Queries) DeleteStudentUser(ctx context.Context, id int64) (StudentUser, error) {
-	row := q.db.QueryRowContext(ctx, deleteStudentUser, id)
+	row := q.queryRow(ctx, q.deleteStudentUserStmt, deleteStudentUser, id)
 	var i StudentUser
 	err := row.Scan(
 		&i.ID,
@@ -100,7 +99,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetStudentUser(ctx context.Context, id int64) (StudentUser, error) {
-	row := q.db.QueryRowContext(ctx, getStudentUser, id)
+	row := q.queryRow(ctx, q.getStudentUserStmt, getStudentUser, id)
 	var i StudentUser
 	err := row.Scan(
 		&i.ID,
@@ -131,7 +130,7 @@ type ListStudentUserParams struct {
 }
 
 func (q *Queries) ListStudentUser(ctx context.Context, arg ListStudentUserParams) ([]StudentUser, error) {
-	rows, err := q.db.QueryContext(ctx, listStudentUser, arg.Limit, arg.Offset)
+	rows, err := q.query(ctx, q.listStudentUserStmt, listStudentUser, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -178,15 +177,15 @@ RETURNING id, username, password, name, date_of_birth, gender, created_at, respo
 
 type UpdateStudentUserParams struct {
 	ID                   int64          `json:"id"`
-	Username             string         `json:"username"`
-	Password             string         `json:"password"`
+	Username             sql.NullString `json:"username"`
+	Password             sql.NullString `json:"password"`
 	Name                 sql.NullString `json:"name"`
-	ResponsibleStudentID int32          `json:"responsible_student_id"`
-	SubjectMatterClassID int32          `json:"subjectMatter_class_id"`
+	ResponsibleStudentID sql.NullInt32  `json:"responsible_student_id"`
+	SubjectMatterClassID sql.NullInt32  `json:"subjectMatter_class_id"`
 }
 
 func (q *Queries) UpdateStudentUser(ctx context.Context, arg UpdateStudentUserParams) (StudentUser, error) {
-	row := q.db.QueryRowContext(ctx, updateStudentUser,
+	row := q.queryRow(ctx, q.updateStudentUserStmt, updateStudentUser,
 		arg.ID,
 		arg.Username,
 		arg.Password,
