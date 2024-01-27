@@ -17,6 +17,11 @@ func NewServer(store db.Store) *Server {
 
 	router.POST("/professionalUser", server.createProfessionalUser)
 	router.POST("/professionalInformation", server.createProfessionalInformation)
+	router.PUT("/professionalUser/:id", server.updateProfessionalUser)
+	router.GET("/professionalUser/:id", server.getProfessionalUserById)
+	router.GET("/professionalUsers", server.listAllProfessionalUsers)
+	router.DELETE("/professionalUser/:id", server.deleteProfessionalUser)
+
 	server.router = router
 	return server
 }
