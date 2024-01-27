@@ -3,7 +3,8 @@ package db
 import (
 	"context"
 	"database/sql"
-	"myclass/db/util"
+	"myclass/util"
+
 	"testing"
 	"time"
 

@@ -1,148 +1,113 @@
 CREATE TABLE "professionalUser" (
-  "id" bigserial PRIMARY KEY,
-  "created_at" timestamp  DEFAULT (now()),
-  "name" varchar ,
-  "username" varchar ,
-  "password" varchar ,
-  "gender" varchar ,
-  "email" varchar ,
-  "date_of_birth" Date ,
-  "cpf" integer ,
-  "image_id" bigint ,
-  "phone_id" bigint UNIQUE ,
-  "professional_information_id" bigint UNIQUE ,
-  "updated_at" timestamp  DEFAULT (now()),
-  "subjectMatter_id" integer UNIQUE ,
-  "subjectMatter_class_id" integer UNIQUE ,
-  "class_hour_price" varchar ,
-  "calendar_id" integer UNIQUE 
+  "id" bigserial PRIMARY KEY NOT NULL,
+  "created_at" timestamp DEFAULT (now()) NOT NULL,
+  "name" varchar NOT NULL,
+  "username" varchar NOT NULL,
+  "password" varchar NOT NULL,
+  "gender" varchar NOT NULL,
+  "email" varchar NOT NULL,
+  "date_of_birth" Date NOT NULL,
+  "cpf" integer NOT NULL,
+  "image_id" bigint NOT NULL,
+  "phone_id" bigint UNIQUE NOT NULL,
+  "professional_information_id" bigint UNIQUE NOT NULL,
+  "updated_at" timestamp DEFAULT (now()) NOT NULL,
+  "subjectMatter_id" integer UNIQUE NOT NULL,
+  "subjectMatter_class_id" integer UNIQUE NOT NULL,
+  "class_hour_price" varchar NOT NULL,
+  "calendar_id" integer UNIQUE NOT NULL
 );
 
 CREATE TABLE "calendar" (
-  "id" bigserial PRIMARY KEY,
-  "subjectMatter_id" integer UNIQUE 
-  ,
-  "time" timestamp,
-  "date" Date,
-  "available" boolean,
-  "filled_student_id" integer UNIQUE 
-  ,
-  "professionalUser_id" integer UNIQUE 
+  "id" bigserial PRIMARY KEY NOT NULL,
+  "subjectMatter_id" integer UNIQUE NOT NULL,
+  "time" timestamp NOT NULL,
+  "date" Date NOT NULL,
+  "available" boolean NOT NULL,
+  "filled_student_id" integer UNIQUE NOT NULL,
+  "professionalUser_id" integer UNIQUE NOT NULL
   
 );
 
 CREATE TABLE "subjectMatter" (
-  "id" bigserial PRIMARY KEY,
-  "title" varchar 
-  ,
-  "created_at" timestamp 
-   DEFAULT (now()),
-  "category" varchar 
-  ,
-  "abstract" varchar
+  "id" bigserial PRIMARY KEY NOT NULL,
+  "title" varchar NOT NULL,
+  "created_at" timestamp DEFAULT (now()) NOT NULL,
+  "category" varchar NOT NULL,
+  "abstract" varchar NOT NULL
 );
 
 CREATE TABLE "subjectMatterClass" (
-  "id" bigserial PRIMARY KEY,
-  "created_at" timestamp 
-   DEFAULT (now()),
-  "subjectMatter_id" integer UNIQUE 
-  ,
-  "professional_id" integer 
-  ,
-  "durantion" integer 
-  ,
-  "enrollment_date" Date 
-  ,
-  "enrollment_time" timestamp 
-  ,
-  "cancellation" boolean,
-  "cancellation_reason" varchar,
-  "student_attendence" boolean,
-  "study_material" varchar,
-  "testing_exam" varchar
+  "id" bigserial PRIMARY KEY NOT NULL,
+  "created_at" timestamp DEFAULT (now()) NOT NULL,
+  "subjectMatter_id" integer UNIQUE NOT NULL,
+  "professional_id" integer NOT NULL,
+  "durantion" integer NOT NULL,
+  "enrollment_date" Date NOT NULL,
+  "enrollment_time" timestamp NOT NULL,
+  "cancellation" boolean NOT NULL,
+  "cancellation_reason" varchar NOT NULL,
+  "student_attendence" boolean NOT NULL,
+  "study_material" varchar NOT NULL,
+  "testing_exam" varchar NOT NULL
 );
 
 CREATE TABLE "studentUser" (
-  "id" bigserial PRIMARY KEY,
-  "username" varchar 
-  ,
-  "password" varchar 
-  ,
-  "name" varchar,
-  "date_of_birth" Date 
-  ,
-  "gender" varchar,
+  "id" bigserial PRIMARY KEY NOT NULL,
+  "username" varchar NOT NULL,
+  "password" varchar NOT NULL,
+  "name" varchar NOT NULL,
+  "date_of_birth" Date NOT NULL,
+  "gender" varchar NOT NULL,
   "created_at" timestamp 
-   DEFAULT (now()),
-  "responsible_student_id" integer UNIQUE 
-  ,
+   DEFAULT (now()) NOT NULL,
+  "responsible_student_id" integer UNIQUE NOT NULL,
   "updated_at" timestamp 
-   DEFAULT (now()),
-  "subjectMatter_class_id" integer UNIQUE 
-  , 
-  "calendar_id" integer UNIQUE 
-  
+   DEFAULT (now()) NOT NULL,
+  "subjectMatter_class_id" integer UNIQUE NOT NULL,
+  "calendar_id" integer UNIQUE NOT NULL
 );
 
 CREATE TABLE "responsibleStudent" (
-  "id" bigserial PRIMARY KEY,
-  "name" varchar 
-  ,
-  "gender" varchar 
-  ,
-  "email" varchar 
-  ,
-  "date_of_birth" Date 
-  ,
-  "cpf" integer 
-  ,
-  "phone_id" bigint UNIQUE 
-  ,
-  "created_at" timestamp 
-   DEFAULT (now()),
+  "id" bigserial PRIMARY KEY NOT NULL,
+  "name" varchar NOT NULL,
+  "gender" varchar NOT NULL,
+  "email" varchar NOT NULL,
+  "date_of_birth" Date NOT NULL,
+  "cpf" integer NOT NULL,
+  "phone_id" bigint UNIQUE NOT NULL,
+  "created_at" timestamp
+   DEFAULT (now()) NOT NULL,
   "updated_at" timestamp 
-   DEFAULT (now())
+   DEFAULT (now()) NOT NULL
 );
 
 CREATE TABLE "professionalInformation" (
-  "id" bigserial PRIMARY KEY,
-  "experience_period" varchar 
-  ,
-  "ocupation_area" varchar 
-  ,
-  "university" varchar 
-  ,
-  "graduation_diploma" varchar 
-  ,
-  "validate" boolean 
-  ,
-  "graduation_country" varchar 
-  ,
-  "graduation_city" varchar 
-  ,
-  "graduation_state" varchar 
-  ,
+  "id" bigserial PRIMARY KEY NOT NULL,
+  "experience_period" varchar NOT NULL,
+  "ocupation_area" varchar NOT NULL,
+  "university" varchar NOT NULL,
+  "graduation_diploma" varchar NOT NULL,
+  "validate" boolean NOT NULL,
+  "graduation_country" varchar NOT NULL,
+  "graduation_city" varchar NOT NULL,
+  "graduation_state" varchar NOT NULL,
   "created_at" timestamp 
-   DEFAULT (now()),
+   DEFAULT (now()) NOT NULL,
   "updated_at" timestamp 
-   DEFAULT (now())
+   DEFAULT (now()) NOT NULL
 );
 
 CREATE TABLE "phone" (
-  "id" bigserial PRIMARY KEY,
-  "country_code" integer 
-  ,
-  "area_core" integer 
-  ,
-  "number" integer 
-  ,
-  "type" varchar 
-  ,
+  "id" bigserial PRIMARY KEY NOT NULL,
+  "country_code" integer NOT NULL,
+  "area_core" integer NOT NULL,
+  "number" integer NOT NULL,
+  "type" varchar NOT NULL,
   "created_at" timestamp 
-   DEFAULT (now()),
+   DEFAULT (now()) NOT NULL,
   "updated_at" timestamp 
-   DEFAULT (now())
+   DEFAULT (now()) NOT NULL
 );
 
 ALTER TABLE "phone" ADD FOREIGN KEY ("id") REFERENCES "professionalUser" ("phone_id");
@@ -151,7 +116,7 @@ ALTER TABLE "professionalInformation" ADD FOREIGN KEY ("id") REFERENCES "profess
 
 ALTER TABLE "subjectMatterClass" ADD FOREIGN KEY ("id") REFERENCES "professionalUser" ("subjectMatter_class_id");
 
-ALTER TABLE "professionalUser" ADD FOREIGN KEY ("calendar_id") REFERENCES "calendar" ("id");
+ALTER TABLE "calendar" ADD FOREIGN KEY ("id") REFERENCES "professionalUser" ("calendar_id");
 
 ALTER TABLE "calendar" ADD FOREIGN KEY ("subjectMatter_id") REFERENCES "subjectMatter" ("id");
 
