@@ -2,12 +2,17 @@ package api
 
 import (
 	db "myclass/db/sqlc"
+	"myclass/services"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
+
+type ProfessionalUserController struct {
+	professionalUserService *services.ProfessionalUserService
+}
 
 type createProfessionalUserRequest struct {
 	Name           string    `json:"name"`
@@ -51,4 +56,31 @@ func (server *Server) createProfessionalUser(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, professionalUser)
+}
+
+type updateProfessionalUser struct {
+	Name           string    `json:"name"`
+	Username       string    `json:"username"`
+	Password       string    `json:"password"`
+	Email          string    `json:"email"`
+	DateOfBirth    time.Time `json:"date_of_birth"`
+	ClassHourPrice string    `json:"class_hour_price"`
+}
+
+func (server *Server) updateProfessionalUser(ctx *gin.Context) {
+	var req updateProfessionalUser
+	professionalUserId := ctx.Param("id")
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	professionalUser, err := server.store.GetProfessionalUser(ctx, professionalUserId)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, "This user does not exists, please create it firstly")
+		return
+	}
+
+	professionalUserUpdated, err := server.store.UpdateProfessionalUser(ctx)
+
 }
