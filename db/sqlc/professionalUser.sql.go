@@ -20,35 +20,31 @@ INSERT INTO "professionalUser" (
     date_of_birth,
     cpf,
     image_id,
-    phone_id,
-    professional_information_id,
     updated_at,
     "subjectMatter_id",
     "subjectMatter_class_id",
     class_hour_price,
     calendar_id 
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15 
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
 )
-RETURNING id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, phone_id, professional_information_id, updated_at, "subjectMatter_id", "subjectMatter_class_id", class_hour_price, calendar_id
+RETURNING id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, updated_at, "subjectMatter_id", "subjectMatter_class_id", class_hour_price, calendar_id
 `
 
 type CreateProfessionalUserParams struct {
-	Name                      string    `json:"name"`
-	Username                  string    `json:"username"`
-	Password                  string    `json:"password"`
-	Gender                    string    `json:"gender"`
-	Email                     string    `json:"email"`
-	DateOfBirth               time.Time `json:"date_of_birth"`
-	Cpf                       int32     `json:"cpf"`
-	ImageID                   int64     `json:"image_id"`
-	PhoneID                   int64     `json:"phone_id"`
-	ProfessionalInformationID int64     `json:"professional_information_id"`
-	UpdatedAt                 time.Time `json:"updated_at"`
-	SubjectMatterID           int32     `json:"subjectMatter_id"`
-	SubjectMatterClassID      int32     `json:"subjectMatter_class_id"`
-	ClassHourPrice            string    `json:"class_hour_price"`
-	CalendarID                int32     `json:"calendar_id"`
+	Name                 string    `json:"name"`
+	Username             string    `json:"username"`
+	Password             string    `json:"password"`
+	Gender               string    `json:"gender"`
+	Email                string    `json:"email"`
+	DateOfBirth          time.Time `json:"date_of_birth"`
+	Cpf                  int32     `json:"cpf"`
+	ImageID              int64     `json:"image_id"`
+	UpdatedAt            time.Time `json:"updated_at"`
+	SubjectMatterID      int32     `json:"subjectMatter_id"`
+	SubjectMatterClassID int32     `json:"subjectMatter_class_id"`
+	ClassHourPrice       string    `json:"class_hour_price"`
+	CalendarID           int32     `json:"calendar_id"`
 }
 
 func (q *Queries) CreateProfessionalUser(ctx context.Context, arg CreateProfessionalUserParams) (ProfessionalUser, error) {
@@ -61,8 +57,6 @@ func (q *Queries) CreateProfessionalUser(ctx context.Context, arg CreateProfessi
 		arg.DateOfBirth,
 		arg.Cpf,
 		arg.ImageID,
-		arg.PhoneID,
-		arg.ProfessionalInformationID,
 		arg.UpdatedAt,
 		arg.SubjectMatterID,
 		arg.SubjectMatterClassID,
@@ -81,8 +75,6 @@ func (q *Queries) CreateProfessionalUser(ctx context.Context, arg CreateProfessi
 		&i.DateOfBirth,
 		&i.Cpf,
 		&i.ImageID,
-		&i.PhoneID,
-		&i.ProfessionalInformationID,
 		&i.UpdatedAt,
 		&i.SubjectMatterID,
 		&i.SubjectMatterClassID,
@@ -95,7 +87,7 @@ func (q *Queries) CreateProfessionalUser(ctx context.Context, arg CreateProfessi
 const deleteProfessionalUser = `-- name: DeleteProfessionalUser :one
 DELETE FROM "professionalUser"
 WHERE id = $1
-RETURNING id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, phone_id, professional_information_id, updated_at, "subjectMatter_id", "subjectMatter_class_id", class_hour_price, calendar_id
+RETURNING id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, updated_at, "subjectMatter_id", "subjectMatter_class_id", class_hour_price, calendar_id
 `
 
 func (q *Queries) DeleteProfessionalUser(ctx context.Context, id int64) (ProfessionalUser, error) {
@@ -112,8 +104,6 @@ func (q *Queries) DeleteProfessionalUser(ctx context.Context, id int64) (Profess
 		&i.DateOfBirth,
 		&i.Cpf,
 		&i.ImageID,
-		&i.PhoneID,
-		&i.ProfessionalInformationID,
 		&i.UpdatedAt,
 		&i.SubjectMatterID,
 		&i.SubjectMatterClassID,
@@ -124,7 +114,7 @@ func (q *Queries) DeleteProfessionalUser(ctx context.Context, id int64) (Profess
 }
 
 const getProfessionalUser = `-- name: GetProfessionalUser :one
-SELECT id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, phone_id, professional_information_id, updated_at, "subjectMatter_id", "subjectMatter_class_id", class_hour_price, calendar_id FROM "professionalUser" 
+SELECT id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, updated_at, "subjectMatter_id", "subjectMatter_class_id", class_hour_price, calendar_id FROM "professionalUser" 
 WHERE id = $1 LIMIT 1
 `
 
@@ -142,8 +132,6 @@ func (q *Queries) GetProfessionalUser(ctx context.Context, id int64) (Profession
 		&i.DateOfBirth,
 		&i.Cpf,
 		&i.ImageID,
-		&i.PhoneID,
-		&i.ProfessionalInformationID,
 		&i.UpdatedAt,
 		&i.SubjectMatterID,
 		&i.SubjectMatterClassID,
@@ -154,7 +142,7 @@ func (q *Queries) GetProfessionalUser(ctx context.Context, id int64) (Profession
 }
 
 const listProfessionalUser = `-- name: ListProfessionalUser :many
-SELECT id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, phone_id, professional_information_id, updated_at, "subjectMatter_id", "subjectMatter_class_id", class_hour_price, calendar_id FROM "professionalUser" 
+SELECT id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, updated_at, "subjectMatter_id", "subjectMatter_class_id", class_hour_price, calendar_id FROM "professionalUser" 
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -185,8 +173,6 @@ func (q *Queries) ListProfessionalUser(ctx context.Context, arg ListProfessional
 			&i.DateOfBirth,
 			&i.Cpf,
 			&i.ImageID,
-			&i.PhoneID,
-			&i.ProfessionalInformationID,
 			&i.UpdatedAt,
 			&i.SubjectMatterID,
 			&i.SubjectMatterClassID,
@@ -215,7 +201,7 @@ UPDATE "professionalUser"
     date_of_birth = $6,
     class_hour_price = $7
 WHERE id = $1
-RETURNING id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, phone_id, professional_information_id, updated_at, "subjectMatter_id", "subjectMatter_class_id", class_hour_price, calendar_id
+RETURNING id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, updated_at, "subjectMatter_id", "subjectMatter_class_id", class_hour_price, calendar_id
 `
 
 type UpdateProfessionalUserParams struct {
@@ -250,8 +236,6 @@ func (q *Queries) UpdateProfessionalUser(ctx context.Context, arg UpdateProfessi
 		&i.DateOfBirth,
 		&i.Cpf,
 		&i.ImageID,
-		&i.PhoneID,
-		&i.ProfessionalInformationID,
 		&i.UpdatedAt,
 		&i.SubjectMatterID,
 		&i.SubjectMatterClassID,

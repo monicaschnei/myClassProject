@@ -20,7 +20,7 @@ INSERT INTO "phone" (
 ) VALUES (
     $1, $2, $3, $4, $5
 )
-RETURNING id, country_code, area_core, number, type, created_at, updated_at
+RETURNING id, country_code, area_core, number, type, created_at, updated_at, user_id
 `
 
 type CreatePhoneParams struct {
@@ -48,6 +48,7 @@ func (q *Queries) CreatePhone(ctx context.Context, arg CreatePhoneParams) (Phone
 		&i.Type,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UserID,
 	)
 	return i, err
 }
@@ -55,7 +56,7 @@ func (q *Queries) CreatePhone(ctx context.Context, arg CreatePhoneParams) (Phone
 const deletePhone = `-- name: DeletePhone :one
 DELETE FROM "phone"
 WHERE id = $1
-RETURNING id, country_code, area_core, number, type, created_at, updated_at
+RETURNING id, country_code, area_core, number, type, created_at, updated_at, user_id
 `
 
 func (q *Queries) DeletePhone(ctx context.Context, id int64) (Phone, error) {
@@ -69,12 +70,13 @@ func (q *Queries) DeletePhone(ctx context.Context, id int64) (Phone, error) {
 		&i.Type,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UserID,
 	)
 	return i, err
 }
 
 const getPhone = `-- name: GetPhone :one
-SELECT id, country_code, area_core, number, type, created_at, updated_at FROM "phone" 
+SELECT id, country_code, area_core, number, type, created_at, updated_at, user_id FROM "phone" 
 WHERE id = $1 LIMIT 1
 `
 
@@ -89,12 +91,13 @@ func (q *Queries) GetPhone(ctx context.Context, id int64) (Phone, error) {
 		&i.Type,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UserID,
 	)
 	return i, err
 }
 
 const listPhone = `-- name: ListPhone :many
-SELECT id, country_code, area_core, number, type, created_at, updated_at FROM "phone" 
+SELECT id, country_code, area_core, number, type, created_at, updated_at, user_id FROM "phone" 
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -122,6 +125,7 @@ func (q *Queries) ListPhone(ctx context.Context, arg ListPhoneParams) ([]Phone, 
 			&i.Type,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.UserID,
 		); err != nil {
 			return nil, err
 		}
@@ -143,7 +147,7 @@ UPDATE "phone"
     number = $4,
     type = $5
 WHERE id = $1
-RETURNING id, country_code, area_core, number, type, created_at, updated_at
+RETURNING id, country_code, area_core, number, type, created_at, updated_at, user_id
 `
 
 type UpdatePhoneParams struct {
@@ -171,6 +175,7 @@ func (q *Queries) UpdatePhone(ctx context.Context, arg UpdatePhoneParams) (Phone
 		&i.Type,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UserID,
 	)
 	return i, err
 }

@@ -8,15 +8,13 @@ INSERT INTO "professionalUser" (
     date_of_birth,
     cpf,
     image_id,
-    phone_id,
-    professional_information_id,
     updated_at,
     "subjectMatter_id",
     "subjectMatter_class_id",
     class_hour_price,
     calendar_id 
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15 
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
 )
 RETURNING *;
 

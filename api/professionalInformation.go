@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	db "myclass/db/sqlc"
 	"net/http"
 	"time"
@@ -10,7 +11,6 @@ import (
 )
 
 type createProfessionalInformationRequest struct {
-	ID                int64     `json:"id"`
 	ExperiencePeriod  string    `json:"experience_period"`
 	OcupationArea     string    `json:"ocupation_area"`
 	University        string    `json:"university"`
@@ -22,23 +22,41 @@ type createProfessionalInformationRequest struct {
 	UpdatedAt         time.Time `json:"updated_at"`
 }
 
+type professionalUserId struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
 func (server *Server) createProfessionalInformation(ctx *gin.Context) {
 	var req createProfessionalInformationRequest
+	var reqUser professionalUserId
+
+	if err := ctx.ShouldBindUri(&reqUser); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	professionalUser, err := server.store.GetProfessionalUser(ctx, reqUser.ID)
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusNotFound, "This user does not exists, please create it firstly")
+		return
+	}
+
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
 	arg := db.CreateProfessionalInformationParams{
-		ExperiencePeriod:  req.ExperiencePeriod,
-		OcupationArea:     req.OcupationArea,
-		University:        req.University,
-		GraduationDiploma: req.GraduationDiploma,
-		Validate:          req.Validate,
-		GraduationCountry: req.GraduationCountry,
-		GraduationCity:    req.GraduationCity,
-		GraduationState:   req.GraduationState,
-		UpdatedAt:         time.Now(),
+		ProfessionalUserID: professionalUser.ID,
+		ExperiencePeriod:   req.ExperiencePeriod,
+		OcupationArea:      req.OcupationArea,
+		University:         req.University,
+		GraduationDiploma:  req.GraduationDiploma,
+		Validate:           false,
+		GraduationCountry:  req.GraduationCountry,
+		GraduationCity:     req.GraduationCity,
+		GraduationState:    req.GraduationState,
+		UpdatedAt:          time.Now(),
 	}
 
 	professionalInformation, err := server.store.CreateProfessionalInformation(ctx, arg)
@@ -46,5 +64,50 @@ func (server *Server) createProfessionalInformation(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
 	ctx.JSON(http.StatusOK, professionalInformation)
+}
+
+type getProfissionalInformationRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+func (server *Server) getProfessionalInformation(ctx *gin.Context) {
+	var req getProfissionalInformationRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	professionalInformation, err := server.store.GetProfessionalInformation(ctx, req.ID)
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusNotFound, "Professional Information not found")
+		return
+	}
+	ctx.JSON(http.StatusOK, professionalInformation)
+}
+
+type listProfessionalInformationsRequest struct {
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+}
+
+func (server *Server) listAllProfessionalInformationsByUser(ctx *gin.Context) {
+	var req listProfessionalInformationsRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.ListProfessionalInformationByUserParams{
+		Limit:  req.PageSize,
+		Offset: (req.PageID - 1) * req.PageSize,
+	}
+
+	professionalUsers, err := server.store.ListProfessionalInformationByUser(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, professionalUsers)
 }

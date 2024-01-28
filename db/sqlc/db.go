@@ -105,6 +105,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.listProfessionalInformationStmt, err = db.PrepareContext(ctx, listProfessionalInformation); err != nil {
 		return nil, fmt.Errorf("error preparing query ListProfessionalInformation: %w", err)
 	}
+	if q.listProfessionalInformationByUserStmt, err = db.PrepareContext(ctx, listProfessionalInformationByUser); err != nil {
+		return nil, fmt.Errorf("error preparing query ListProfessionalInformationByUser: %w", err)
+	}
 	if q.listProfessionalUserStmt, err = db.PrepareContext(ctx, listProfessionalUser); err != nil {
 		return nil, fmt.Errorf("error preparing query ListProfessionalUser: %w", err)
 	}
@@ -284,6 +287,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listProfessionalInformationStmt: %w", cerr)
 		}
 	}
+	if q.listProfessionalInformationByUserStmt != nil {
+		if cerr := q.listProfessionalInformationByUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listProfessionalInformationByUserStmt: %w", cerr)
+		}
+	}
 	if q.listProfessionalUserStmt != nil {
 		if cerr := q.listProfessionalUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listProfessionalUserStmt: %w", cerr)
@@ -386,93 +394,95 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                                DBTX
-	tx                                *sql.Tx
-	createCalendarStmt                *sql.Stmt
-	createPhoneStmt                   *sql.Stmt
-	createProfessionalInformationStmt *sql.Stmt
-	createProfessionalUserStmt        *sql.Stmt
-	createResponsibleStudentStmt      *sql.Stmt
-	createStudentUserStmt             *sql.Stmt
-	createSubjectMatterStmt           *sql.Stmt
-	createSubjectMatterClassStmt      *sql.Stmt
-	deleteCalendarStmt                *sql.Stmt
-	deletePhoneStmt                   *sql.Stmt
-	deleteProfessionalInformationStmt *sql.Stmt
-	deleteProfessionalUserStmt        *sql.Stmt
-	deleteResponsibleStudentStmt      *sql.Stmt
-	deleteStudentUserStmt             *sql.Stmt
-	deleteSubjectMatterStmt           *sql.Stmt
-	deleteSubjectMatterClassStmt      *sql.Stmt
-	getCalendarStmt                   *sql.Stmt
-	getPhoneStmt                      *sql.Stmt
-	getProfessionalInformationStmt    *sql.Stmt
-	getProfessionalUserStmt           *sql.Stmt
-	getResponsibleStudentStmt         *sql.Stmt
-	getStudentUserStmt                *sql.Stmt
-	getSubjectMatterStmt              *sql.Stmt
-	getSubjectMatterClassStmt         *sql.Stmt
-	listCalendarStmt                  *sql.Stmt
-	listPhoneStmt                     *sql.Stmt
-	listProfessionalInformationStmt   *sql.Stmt
-	listProfessionalUserStmt          *sql.Stmt
-	listResponsibleStudentStmt        *sql.Stmt
-	listStudentUserStmt               *sql.Stmt
-	listSubjectMatterStmt             *sql.Stmt
-	listSubjectMatterClassStmt        *sql.Stmt
-	updateCalendarStmt                *sql.Stmt
-	updatePhoneStmt                   *sql.Stmt
-	updateProfessionalInformationStmt *sql.Stmt
-	updateProfessionalUserStmt        *sql.Stmt
-	updateResponsibleStudentStmt      *sql.Stmt
-	updateStudentUserStmt             *sql.Stmt
-	updateSubjectMatterStmt           *sql.Stmt
-	updateSubjectMatterClassStmt      *sql.Stmt
+	db                                    DBTX
+	tx                                    *sql.Tx
+	createCalendarStmt                    *sql.Stmt
+	createPhoneStmt                       *sql.Stmt
+	createProfessionalInformationStmt     *sql.Stmt
+	createProfessionalUserStmt            *sql.Stmt
+	createResponsibleStudentStmt          *sql.Stmt
+	createStudentUserStmt                 *sql.Stmt
+	createSubjectMatterStmt               *sql.Stmt
+	createSubjectMatterClassStmt          *sql.Stmt
+	deleteCalendarStmt                    *sql.Stmt
+	deletePhoneStmt                       *sql.Stmt
+	deleteProfessionalInformationStmt     *sql.Stmt
+	deleteProfessionalUserStmt            *sql.Stmt
+	deleteResponsibleStudentStmt          *sql.Stmt
+	deleteStudentUserStmt                 *sql.Stmt
+	deleteSubjectMatterStmt               *sql.Stmt
+	deleteSubjectMatterClassStmt          *sql.Stmt
+	getCalendarStmt                       *sql.Stmt
+	getPhoneStmt                          *sql.Stmt
+	getProfessionalInformationStmt        *sql.Stmt
+	getProfessionalUserStmt               *sql.Stmt
+	getResponsibleStudentStmt             *sql.Stmt
+	getStudentUserStmt                    *sql.Stmt
+	getSubjectMatterStmt                  *sql.Stmt
+	getSubjectMatterClassStmt             *sql.Stmt
+	listCalendarStmt                      *sql.Stmt
+	listPhoneStmt                         *sql.Stmt
+	listProfessionalInformationStmt       *sql.Stmt
+	listProfessionalInformationByUserStmt *sql.Stmt
+	listProfessionalUserStmt              *sql.Stmt
+	listResponsibleStudentStmt            *sql.Stmt
+	listStudentUserStmt                   *sql.Stmt
+	listSubjectMatterStmt                 *sql.Stmt
+	listSubjectMatterClassStmt            *sql.Stmt
+	updateCalendarStmt                    *sql.Stmt
+	updatePhoneStmt                       *sql.Stmt
+	updateProfessionalInformationStmt     *sql.Stmt
+	updateProfessionalUserStmt            *sql.Stmt
+	updateResponsibleStudentStmt          *sql.Stmt
+	updateStudentUserStmt                 *sql.Stmt
+	updateSubjectMatterStmt               *sql.Stmt
+	updateSubjectMatterClassStmt          *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                                tx,
-		tx:                                tx,
-		createCalendarStmt:                q.createCalendarStmt,
-		createPhoneStmt:                   q.createPhoneStmt,
-		createProfessionalInformationStmt: q.createProfessionalInformationStmt,
-		createProfessionalUserStmt:        q.createProfessionalUserStmt,
-		createResponsibleStudentStmt:      q.createResponsibleStudentStmt,
-		createStudentUserStmt:             q.createStudentUserStmt,
-		createSubjectMatterStmt:           q.createSubjectMatterStmt,
-		createSubjectMatterClassStmt:      q.createSubjectMatterClassStmt,
-		deleteCalendarStmt:                q.deleteCalendarStmt,
-		deletePhoneStmt:                   q.deletePhoneStmt,
-		deleteProfessionalInformationStmt: q.deleteProfessionalInformationStmt,
-		deleteProfessionalUserStmt:        q.deleteProfessionalUserStmt,
-		deleteResponsibleStudentStmt:      q.deleteResponsibleStudentStmt,
-		deleteStudentUserStmt:             q.deleteStudentUserStmt,
-		deleteSubjectMatterStmt:           q.deleteSubjectMatterStmt,
-		deleteSubjectMatterClassStmt:      q.deleteSubjectMatterClassStmt,
-		getCalendarStmt:                   q.getCalendarStmt,
-		getPhoneStmt:                      q.getPhoneStmt,
-		getProfessionalInformationStmt:    q.getProfessionalInformationStmt,
-		getProfessionalUserStmt:           q.getProfessionalUserStmt,
-		getResponsibleStudentStmt:         q.getResponsibleStudentStmt,
-		getStudentUserStmt:                q.getStudentUserStmt,
-		getSubjectMatterStmt:              q.getSubjectMatterStmt,
-		getSubjectMatterClassStmt:         q.getSubjectMatterClassStmt,
-		listCalendarStmt:                  q.listCalendarStmt,
-		listPhoneStmt:                     q.listPhoneStmt,
-		listProfessionalInformationStmt:   q.listProfessionalInformationStmt,
-		listProfessionalUserStmt:          q.listProfessionalUserStmt,
-		listResponsibleStudentStmt:        q.listResponsibleStudentStmt,
-		listStudentUserStmt:               q.listStudentUserStmt,
-		listSubjectMatterStmt:             q.listSubjectMatterStmt,
-		listSubjectMatterClassStmt:        q.listSubjectMatterClassStmt,
-		updateCalendarStmt:                q.updateCalendarStmt,
-		updatePhoneStmt:                   q.updatePhoneStmt,
-		updateProfessionalInformationStmt: q.updateProfessionalInformationStmt,
-		updateProfessionalUserStmt:        q.updateProfessionalUserStmt,
-		updateResponsibleStudentStmt:      q.updateResponsibleStudentStmt,
-		updateStudentUserStmt:             q.updateStudentUserStmt,
-		updateSubjectMatterStmt:           q.updateSubjectMatterStmt,
-		updateSubjectMatterClassStmt:      q.updateSubjectMatterClassStmt,
+		db:                                    tx,
+		tx:                                    tx,
+		createCalendarStmt:                    q.createCalendarStmt,
+		createPhoneStmt:                       q.createPhoneStmt,
+		createProfessionalInformationStmt:     q.createProfessionalInformationStmt,
+		createProfessionalUserStmt:            q.createProfessionalUserStmt,
+		createResponsibleStudentStmt:          q.createResponsibleStudentStmt,
+		createStudentUserStmt:                 q.createStudentUserStmt,
+		createSubjectMatterStmt:               q.createSubjectMatterStmt,
+		createSubjectMatterClassStmt:          q.createSubjectMatterClassStmt,
+		deleteCalendarStmt:                    q.deleteCalendarStmt,
+		deletePhoneStmt:                       q.deletePhoneStmt,
+		deleteProfessionalInformationStmt:     q.deleteProfessionalInformationStmt,
+		deleteProfessionalUserStmt:            q.deleteProfessionalUserStmt,
+		deleteResponsibleStudentStmt:          q.deleteResponsibleStudentStmt,
+		deleteStudentUserStmt:                 q.deleteStudentUserStmt,
+		deleteSubjectMatterStmt:               q.deleteSubjectMatterStmt,
+		deleteSubjectMatterClassStmt:          q.deleteSubjectMatterClassStmt,
+		getCalendarStmt:                       q.getCalendarStmt,
+		getPhoneStmt:                          q.getPhoneStmt,
+		getProfessionalInformationStmt:        q.getProfessionalInformationStmt,
+		getProfessionalUserStmt:               q.getProfessionalUserStmt,
+		getResponsibleStudentStmt:             q.getResponsibleStudentStmt,
+		getStudentUserStmt:                    q.getStudentUserStmt,
+		getSubjectMatterStmt:                  q.getSubjectMatterStmt,
+		getSubjectMatterClassStmt:             q.getSubjectMatterClassStmt,
+		listCalendarStmt:                      q.listCalendarStmt,
+		listPhoneStmt:                         q.listPhoneStmt,
+		listProfessionalInformationStmt:       q.listProfessionalInformationStmt,
+		listProfessionalInformationByUserStmt: q.listProfessionalInformationByUserStmt,
+		listProfessionalUserStmt:              q.listProfessionalUserStmt,
+		listResponsibleStudentStmt:            q.listResponsibleStudentStmt,
+		listStudentUserStmt:                   q.listStudentUserStmt,
+		listSubjectMatterStmt:                 q.listSubjectMatterStmt,
+		listSubjectMatterClassStmt:            q.listSubjectMatterClassStmt,
+		updateCalendarStmt:                    q.updateCalendarStmt,
+		updatePhoneStmt:                       q.updatePhoneStmt,
+		updateProfessionalInformationStmt:     q.updateProfessionalInformationStmt,
+		updateProfessionalUserStmt:            q.updateProfessionalUserStmt,
+		updateResponsibleStudentStmt:          q.updateResponsibleStudentStmt,
+		updateStudentUserStmt:                 q.updateStudentUserStmt,
+		updateSubjectMatterStmt:               q.updateSubjectMatterStmt,
+		updateSubjectMatterClassStmt:          q.updateSubjectMatterClassStmt,
 	}
 }

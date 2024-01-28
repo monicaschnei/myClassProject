@@ -1,6 +1,6 @@
 -- name: CreateProfessionalInformation :one
 INSERT INTO "professionalInformation" (
-  id,
+  professional_user_id,
   experience_period,
   ocupation_area,
   university,
@@ -11,7 +11,7 @@ INSERT INTO "professionalInformation" (
   graduation_state,
   updated_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+    $1, $2, $3, $4, $5, $6, $7, $8, $9,$10
 )
 RETURNING *;
 
@@ -25,6 +25,11 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
+-- name: ListProfessionalInformationByUser :many
+SELECT * FROM "professionalInformation"
+WHERE professional_user_id = $1
+LIMIT $1
+OFFSET $2;
 
 -- name: UpdateProfessionalInformation :one
 UPDATE "professionalInformation"

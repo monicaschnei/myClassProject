@@ -36,6 +36,7 @@ type Querier interface {
 	ListCalendar(ctx context.Context, arg ListCalendarParams) ([]Calendar, error)
 	ListPhone(ctx context.Context, arg ListPhoneParams) ([]Phone, error)
 	ListProfessionalInformation(ctx context.Context, arg ListProfessionalInformationParams) ([]ProfessionalInformation, error)
+	ListProfessionalInformationByUser(ctx context.Context, arg ListProfessionalInformationByUserParams) ([]ProfessionalInformation, error)
 	ListProfessionalUser(ctx context.Context, arg ListProfessionalUserParams) ([]ProfessionalUser, error)
 	ListResponsibleStudent(ctx context.Context, arg ListResponsibleStudentParams) ([]ResponsibleStudent, error)
 	ListStudentUser(ctx context.Context, arg ListStudentUserParams) ([]StudentUser, error)

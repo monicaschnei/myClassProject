@@ -9,8 +9,6 @@ CREATE TABLE "professionalUser" (
   "date_of_birth" Date NOT NULL,
   "cpf" integer NOT NULL,
   "image_id" bigint NOT NULL,
-  "phone_id" bigint UNIQUE NOT NULL,
-  "professional_information_id" bigint UNIQUE NOT NULL,
   "updated_at" timestamp DEFAULT (now()) NOT NULL,
   "subjectMatter_id" integer UNIQUE NOT NULL,
   "subjectMatter_class_id" integer UNIQUE NOT NULL,
@@ -92,10 +90,9 @@ CREATE TABLE "professionalInformation" (
   "graduation_country" varchar NOT NULL,
   "graduation_city" varchar NOT NULL,
   "graduation_state" varchar NOT NULL,
-  "created_at" timestamp 
-   DEFAULT (now()) NOT NULL,
-  "updated_at" timestamp 
-   DEFAULT (now()) NOT NULL
+  "created_at" timestamp DEFAULT (now()) NOT NULL,
+  "updated_at" timestamp DEFAULT (now()) NOT NULL,
+  "professional_user_id" bigint UNIQUE NOT NULL
 );
 
 CREATE TABLE "phone" (
@@ -107,14 +104,17 @@ CREATE TABLE "phone" (
   "created_at" timestamp 
    DEFAULT (now()) NOT NULL,
   "updated_at" timestamp 
-   DEFAULT (now()) NOT NULL
+   DEFAULT (now()) NOT NULL,
+  "user_id" bigint UNIQUE NOT NULL
 );
 
-ALTER TABLE "phone" ADD FOREIGN KEY ("id") REFERENCES "professionalUser" ("phone_id");
+ALTER TABLE "phone" ADD FOREIGN KEY ("user_id") REFERENCES "professionalUser" ("id");
 
-ALTER TABLE "professionalInformation" ADD FOREIGN KEY ("id") REFERENCES "professionalUser" ("professional_information_id");
+ALTER TABLE "professionalInformation" ADD FOREIGN KEY ("professional_user_id") REFERENCES "professionalUser" ("id");
 
-ALTER TABLE "subjectMatterClass" ADD FOREIGN KEY ("id") REFERENCES "professionalUser" ("subjectMatter_class_id");
+ALTER TABLE  "subjectMatterClass" ADD FOREIGN KEY ("id") REFERENCES "professionalUser" ("subjectMatter_class_id");
+
+ALTER TABLE  "subjectMatter" ADD FOREIGN KEY ("id") REFERENCES "professionalUser"  ("subjectMatter_id");
 
 ALTER TABLE "calendar" ADD FOREIGN KEY ("id") REFERENCES "professionalUser" ("calendar_id");
 
@@ -126,11 +126,11 @@ ALTER TABLE "subjectMatterClass" ADD FOREIGN KEY ("subjectMatter_id") REFERENCES
 
 ALTER TABLE "studentUser" ADD FOREIGN KEY ("responsible_student_id") REFERENCES "responsibleStudent" ("id");
 
-ALTER TABLE "subjectMatterClass" ADD FOREIGN KEY ("id") REFERENCES "studentUser" ("subjectMatter_class_id");
+ALTER TABLE "studentUser" ADD FOREIGN KEY ("subjectMatter_class_id") REFERENCES "subjectMatterClass"  ("id");
 
 ALTER TABLE "studentUser" ADD FOREIGN KEY ("calendar_id") REFERENCES "calendar" ("id");
 
-ALTER TABLE "phone" ADD FOREIGN KEY ("id") REFERENCES "responsibleStudent" ("phone_id");
+ALTER TABLE "responsibleStudent" ADD FOREIGN KEY ("phone_id") REFERENCES "phone" ("id");
 
 CREATE TABLE "professionalUser_subjectMatter" (
   "professionalUser_id" bigserial UNIQUE 

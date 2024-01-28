@@ -26,40 +26,40 @@ type Phone struct {
 	Type        string    `json:"type"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	UserID      int64     `json:"user_id"`
 }
 
 type ProfessionalInformation struct {
-	ID                int64     `json:"id"`
-	ExperiencePeriod  string    `json:"experience_period"`
-	OcupationArea     string    `json:"ocupation_area"`
-	University        string    `json:"university"`
-	GraduationDiploma string    `json:"graduation_diploma"`
-	Validate          bool      `json:"validate"`
-	GraduationCountry string    `json:"graduation_country"`
-	GraduationCity    string    `json:"graduation_city"`
-	GraduationState   string    `json:"graduation_state"`
-	CreatedAt         time.Time `json:"created_at"`
-	UpdatedAt         time.Time `json:"updated_at"`
+	ID                 int64     `json:"id"`
+	ExperiencePeriod   string    `json:"experience_period"`
+	OcupationArea      string    `json:"ocupation_area"`
+	University         string    `json:"university"`
+	GraduationDiploma  string    `json:"graduation_diploma"`
+	Validate           bool      `json:"validate"`
+	GraduationCountry  string    `json:"graduation_country"`
+	GraduationCity     string    `json:"graduation_city"`
+	GraduationState    string    `json:"graduation_state"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
+	ProfessionalUserID int64     `json:"professional_user_id"`
 }
 
 type ProfessionalUser struct {
-	ID                        int64     `json:"id"`
-	CreatedAt                 time.Time `json:"created_at"`
-	Name                      string    `json:"name"`
-	Username                  string    `json:"username"`
-	Password                  string    `json:"password"`
-	Gender                    string    `json:"gender"`
-	Email                     string    `json:"email"`
-	DateOfBirth               time.Time `json:"date_of_birth"`
-	Cpf                       int32     `json:"cpf"`
-	ImageID                   int64     `json:"image_id"`
-	PhoneID                   int64     `json:"phone_id"`
-	ProfessionalInformationID int64     `json:"professional_information_id"`
-	UpdatedAt                 time.Time `json:"updated_at"`
-	SubjectMatterID           int32     `json:"subjectMatter_id"`
-	SubjectMatterClassID      int32     `json:"subjectMatter_class_id"`
-	ClassHourPrice            string    `json:"class_hour_price"`
-	CalendarID                int32     `json:"calendar_id"`
+	ID                   int64     `json:"id"`
+	CreatedAt            time.Time `json:"created_at"`
+	Name                 string    `json:"name"`
+	Username             string    `json:"username"`
+	Password             string    `json:"password"`
+	Gender               string    `json:"gender"`
+	Email                string    `json:"email"`
+	DateOfBirth          time.Time `json:"date_of_birth"`
+	Cpf                  int32     `json:"cpf"`
+	ImageID              int64     `json:"image_id"`
+	UpdatedAt            time.Time `json:"updated_at"`
+	SubjectMatterID      int32     `json:"subjectMatter_id"`
+	SubjectMatterClassID int32     `json:"subjectMatter_class_id"`
+	ClassHourPrice       string    `json:"class_hour_price"`
+	CalendarID           int32     `json:"calendar_id"`
 }
 
 type ProfessionalUserSubjectMatter struct {
