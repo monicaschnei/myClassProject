@@ -24,6 +24,7 @@ type createProfessionalUserRequest struct {
 	DateOfBirth    time.Time `json:"date_of_birth"`
 	Cpf            int32     `json:"cpf"`
 	ClassHourPrice string    `json:"class_hour_price"`
+	ImageID        int64     `json:"image_id"`
 }
 
 func (server *Server) createProfessionalUser(ctx *gin.Context) {
@@ -41,7 +42,7 @@ func (server *Server) createProfessionalUser(ctx *gin.Context) {
 		Email:          req.Email,
 		DateOfBirth:    req.DateOfBirth,
 		Cpf:            req.Cpf,
-		ImageID:        0,
+		ImageID:        req.ImageID,
 		UpdatedAt:      time.Now(),
 		ClassHourPrice: req.ClassHourPrice,
 	}
