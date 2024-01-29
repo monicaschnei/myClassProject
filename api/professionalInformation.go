@@ -119,3 +119,52 @@ func (server *Server) listAllProfessionalInformationsByUser(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, professionalInformationsByUser)
 }
+
+type updateProfessionalInformation struct {
+	ExperiencePeriod  string `json:"experience_period"`
+	OcupationArea     string `json:"ocupation_area"`
+	University        string `json:"university"`
+	GraduationDiploma string `json:"graduation_diploma"`
+	Validate          bool   `json:"validate"`
+	GraduationCountry string `json:"graduation_country"`
+	GraduationCity    string `json:"graduation_city"`
+	GraduationState   string `json:"graduation_state"`
+}
+
+func (server *Server) updateProfessionalInformation(ctx *gin.Context) {
+	var req updateProfessionalInformation
+	var reqUser professionalUserId
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if err := ctx.ShouldBindUri(&reqUser); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	professionalUser, err := server.store.GetProfessionalUser(ctx, reqUser.ID)
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusNotFound, "This user does not exists, please create it firstly")
+		return
+	}
+	arg := db.UpdateProfessionalInformationParams{
+		ProfessionalUserID: professionalUser.ID,
+		ExperiencePeriod:   req.ExperiencePeriod,
+		OcupationArea:      req.OcupationArea,
+		University:         req.University,
+		GraduationDiploma:  req.GraduationDiploma,
+		Validate:           false,
+		GraduationCountry:  req.GraduationCountry,
+		GraduationCity:     req.GraduationCity,
+		GraduationState:    req.GraduationState,
+	}
+	professionalUserUpdated, err := server.store.UpdateProfessionalInformation(ctx, arg)
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusBadRequest, "Could not update this user")
+		return
+	}
+	ctx.JSON(http.StatusOK, professionalUserUpdated)
+}

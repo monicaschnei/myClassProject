@@ -40,7 +40,7 @@ UPDATE "professionalInformation"
     validate = $7,
     graduation_country = $8,
     graduation_city = $9
-WHERE id = $1
+WHERE professional_user_id = $1
 RETURNING *;
 
 -- name: DeleteProfessionalInformation :one

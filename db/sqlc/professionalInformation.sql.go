@@ -223,25 +223,25 @@ UPDATE "professionalInformation"
     validate = $7,
     graduation_country = $8,
     graduation_city = $9
-WHERE id = $1
+WHERE professional_user_id = $1
 RETURNING id, experience_period, ocupation_area, university, graduation_diploma, validate, graduation_country, graduation_city, graduation_state, created_at, updated_at, professional_user_id
 `
 
 type UpdateProfessionalInformationParams struct {
-	ID                int64  `json:"id"`
-	GraduationState   string `json:"graduation_state"`
-	ExperiencePeriod  string `json:"experience_period"`
-	OcupationArea     string `json:"ocupation_area"`
-	University        string `json:"university"`
-	GraduationDiploma string `json:"graduation_diploma"`
-	Validate          bool   `json:"validate"`
-	GraduationCountry string `json:"graduation_country"`
-	GraduationCity    string `json:"graduation_city"`
+	ProfessionalUserID int64  `json:"professional_user_id"`
+	GraduationState    string `json:"graduation_state"`
+	ExperiencePeriod   string `json:"experience_period"`
+	OcupationArea      string `json:"ocupation_area"`
+	University         string `json:"university"`
+	GraduationDiploma  string `json:"graduation_diploma"`
+	Validate           bool   `json:"validate"`
+	GraduationCountry  string `json:"graduation_country"`
+	GraduationCity     string `json:"graduation_city"`
 }
 
 func (q *Queries) UpdateProfessionalInformation(ctx context.Context, arg UpdateProfessionalInformationParams) (ProfessionalInformation, error) {
 	row := q.queryRow(ctx, q.updateProfessionalInformationStmt, updateProfessionalInformation,
-		arg.ID,
+		arg.ProfessionalUserID,
 		arg.GraduationState,
 		arg.ExperiencePeriod,
 		arg.OcupationArea,
