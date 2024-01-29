@@ -24,9 +24,6 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
-	if q.createCalendarStmt, err = db.PrepareContext(ctx, createCalendar); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateCalendar: %w", err)
-	}
 	if q.createPhoneStmt, err = db.PrepareContext(ctx, createPhone); err != nil {
 		return nil, fmt.Errorf("error preparing query CreatePhone: %w", err)
 	}
@@ -47,9 +44,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.createSubjectMatterClassStmt, err = db.PrepareContext(ctx, createSubjectMatterClass); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateSubjectMatterClass: %w", err)
-	}
-	if q.deleteCalendarStmt, err = db.PrepareContext(ctx, deleteCalendar); err != nil {
-		return nil, fmt.Errorf("error preparing query DeleteCalendar: %w", err)
 	}
 	if q.deletePhoneStmt, err = db.PrepareContext(ctx, deletePhone); err != nil {
 		return nil, fmt.Errorf("error preparing query DeletePhone: %w", err)
@@ -72,9 +66,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteSubjectMatterClassStmt, err = db.PrepareContext(ctx, deleteSubjectMatterClass); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteSubjectMatterClass: %w", err)
 	}
-	if q.getCalendarStmt, err = db.PrepareContext(ctx, getCalendar); err != nil {
-		return nil, fmt.Errorf("error preparing query GetCalendar: %w", err)
-	}
 	if q.getPhoneStmt, err = db.PrepareContext(ctx, getPhone); err != nil {
 		return nil, fmt.Errorf("error preparing query GetPhone: %w", err)
 	}
@@ -95,9 +86,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.getSubjectMatterClassStmt, err = db.PrepareContext(ctx, getSubjectMatterClass); err != nil {
 		return nil, fmt.Errorf("error preparing query GetSubjectMatterClass: %w", err)
-	}
-	if q.listCalendarStmt, err = db.PrepareContext(ctx, listCalendar); err != nil {
-		return nil, fmt.Errorf("error preparing query ListCalendar: %w", err)
 	}
 	if q.listPhoneStmt, err = db.PrepareContext(ctx, listPhone); err != nil {
 		return nil, fmt.Errorf("error preparing query ListPhone: %w", err)
@@ -122,9 +110,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.listSubjectMatterClassStmt, err = db.PrepareContext(ctx, listSubjectMatterClass); err != nil {
 		return nil, fmt.Errorf("error preparing query ListSubjectMatterClass: %w", err)
-	}
-	if q.updateCalendarStmt, err = db.PrepareContext(ctx, updateCalendar); err != nil {
-		return nil, fmt.Errorf("error preparing query UpdateCalendar: %w", err)
 	}
 	if q.updatePhoneStmt, err = db.PrepareContext(ctx, updatePhone); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdatePhone: %w", err)
@@ -152,11 +137,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
-	if q.createCalendarStmt != nil {
-		if cerr := q.createCalendarStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createCalendarStmt: %w", cerr)
-		}
-	}
 	if q.createPhoneStmt != nil {
 		if cerr := q.createPhoneStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createPhoneStmt: %w", cerr)
@@ -190,11 +170,6 @@ func (q *Queries) Close() error {
 	if q.createSubjectMatterClassStmt != nil {
 		if cerr := q.createSubjectMatterClassStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createSubjectMatterClassStmt: %w", cerr)
-		}
-	}
-	if q.deleteCalendarStmt != nil {
-		if cerr := q.deleteCalendarStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing deleteCalendarStmt: %w", cerr)
 		}
 	}
 	if q.deletePhoneStmt != nil {
@@ -232,11 +207,6 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteSubjectMatterClassStmt: %w", cerr)
 		}
 	}
-	if q.getCalendarStmt != nil {
-		if cerr := q.getCalendarStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getCalendarStmt: %w", cerr)
-		}
-	}
 	if q.getPhoneStmt != nil {
 		if cerr := q.getPhoneStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getPhoneStmt: %w", cerr)
@@ -270,11 +240,6 @@ func (q *Queries) Close() error {
 	if q.getSubjectMatterClassStmt != nil {
 		if cerr := q.getSubjectMatterClassStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getSubjectMatterClassStmt: %w", cerr)
-		}
-	}
-	if q.listCalendarStmt != nil {
-		if cerr := q.listCalendarStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing listCalendarStmt: %w", cerr)
 		}
 	}
 	if q.listPhoneStmt != nil {
@@ -315,11 +280,6 @@ func (q *Queries) Close() error {
 	if q.listSubjectMatterClassStmt != nil {
 		if cerr := q.listSubjectMatterClassStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listSubjectMatterClassStmt: %w", cerr)
-		}
-	}
-	if q.updateCalendarStmt != nil {
-		if cerr := q.updateCalendarStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing updateCalendarStmt: %w", cerr)
 		}
 	}
 	if q.updatePhoneStmt != nil {
@@ -396,7 +356,6 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                                    DBTX
 	tx                                    *sql.Tx
-	createCalendarStmt                    *sql.Stmt
 	createPhoneStmt                       *sql.Stmt
 	createProfessionalInformationStmt     *sql.Stmt
 	createProfessionalUserStmt            *sql.Stmt
@@ -404,7 +363,6 @@ type Queries struct {
 	createStudentUserStmt                 *sql.Stmt
 	createSubjectMatterStmt               *sql.Stmt
 	createSubjectMatterClassStmt          *sql.Stmt
-	deleteCalendarStmt                    *sql.Stmt
 	deletePhoneStmt                       *sql.Stmt
 	deleteProfessionalInformationStmt     *sql.Stmt
 	deleteProfessionalUserStmt            *sql.Stmt
@@ -412,7 +370,6 @@ type Queries struct {
 	deleteStudentUserStmt                 *sql.Stmt
 	deleteSubjectMatterStmt               *sql.Stmt
 	deleteSubjectMatterClassStmt          *sql.Stmt
-	getCalendarStmt                       *sql.Stmt
 	getPhoneStmt                          *sql.Stmt
 	getProfessionalInformationStmt        *sql.Stmt
 	getProfessionalUserStmt               *sql.Stmt
@@ -420,7 +377,6 @@ type Queries struct {
 	getStudentUserStmt                    *sql.Stmt
 	getSubjectMatterStmt                  *sql.Stmt
 	getSubjectMatterClassStmt             *sql.Stmt
-	listCalendarStmt                      *sql.Stmt
 	listPhoneStmt                         *sql.Stmt
 	listProfessionalInformationStmt       *sql.Stmt
 	listProfessionalInformationByUserStmt *sql.Stmt
@@ -429,7 +385,6 @@ type Queries struct {
 	listStudentUserStmt                   *sql.Stmt
 	listSubjectMatterStmt                 *sql.Stmt
 	listSubjectMatterClassStmt            *sql.Stmt
-	updateCalendarStmt                    *sql.Stmt
 	updatePhoneStmt                       *sql.Stmt
 	updateProfessionalInformationStmt     *sql.Stmt
 	updateProfessionalUserStmt            *sql.Stmt
@@ -443,7 +398,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                                    tx,
 		tx:                                    tx,
-		createCalendarStmt:                    q.createCalendarStmt,
 		createPhoneStmt:                       q.createPhoneStmt,
 		createProfessionalInformationStmt:     q.createProfessionalInformationStmt,
 		createProfessionalUserStmt:            q.createProfessionalUserStmt,
@@ -451,7 +405,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createStudentUserStmt:                 q.createStudentUserStmt,
 		createSubjectMatterStmt:               q.createSubjectMatterStmt,
 		createSubjectMatterClassStmt:          q.createSubjectMatterClassStmt,
-		deleteCalendarStmt:                    q.deleteCalendarStmt,
 		deletePhoneStmt:                       q.deletePhoneStmt,
 		deleteProfessionalInformationStmt:     q.deleteProfessionalInformationStmt,
 		deleteProfessionalUserStmt:            q.deleteProfessionalUserStmt,
@@ -459,7 +412,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteStudentUserStmt:                 q.deleteStudentUserStmt,
 		deleteSubjectMatterStmt:               q.deleteSubjectMatterStmt,
 		deleteSubjectMatterClassStmt:          q.deleteSubjectMatterClassStmt,
-		getCalendarStmt:                       q.getCalendarStmt,
 		getPhoneStmt:                          q.getPhoneStmt,
 		getProfessionalInformationStmt:        q.getProfessionalInformationStmt,
 		getProfessionalUserStmt:               q.getProfessionalUserStmt,
@@ -467,7 +419,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getStudentUserStmt:                    q.getStudentUserStmt,
 		getSubjectMatterStmt:                  q.getSubjectMatterStmt,
 		getSubjectMatterClassStmt:             q.getSubjectMatterClassStmt,
-		listCalendarStmt:                      q.listCalendarStmt,
 		listPhoneStmt:                         q.listPhoneStmt,
 		listProfessionalInformationStmt:       q.listProfessionalInformationStmt,
 		listProfessionalInformationByUserStmt: q.listProfessionalInformationByUserStmt,
@@ -476,7 +427,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listStudentUserStmt:                   q.listStudentUserStmt,
 		listSubjectMatterStmt:                 q.listSubjectMatterStmt,
 		listSubjectMatterClassStmt:            q.listSubjectMatterClassStmt,
-		updateCalendarStmt:                    q.updateCalendarStmt,
 		updatePhoneStmt:                       q.updatePhoneStmt,
 		updateProfessionalInformationStmt:     q.updateProfessionalInformationStmt,
 		updateProfessionalUserStmt:            q.updateProfessionalUserStmt,

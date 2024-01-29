@@ -5,10 +5,9 @@ gender,
 email,
 date_of_birth,
 cpf,
-phone_id,
 updated_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7
+    $1, $2, $3, $4, $5, $6
 )
 RETURNING *;
 

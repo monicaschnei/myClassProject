@@ -17,12 +17,11 @@ gender,
 email,
 date_of_birth,
 cpf,
-phone_id,
 updated_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7
+    $1, $2, $3, $4, $5, $6
 )
-RETURNING id, name, gender, email, date_of_birth, cpf, phone_id, created_at, updated_at
+RETURNING id, name, gender, email, date_of_birth, cpf, created_at, updated_at
 `
 
 type CreateResponsibleStudentParams struct {
@@ -31,7 +30,6 @@ type CreateResponsibleStudentParams struct {
 	Email       string    `json:"email"`
 	DateOfBirth time.Time `json:"date_of_birth"`
 	Cpf         int32     `json:"cpf"`
-	PhoneID     int64     `json:"phone_id"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
@@ -42,7 +40,6 @@ func (q *Queries) CreateResponsibleStudent(ctx context.Context, arg CreateRespon
 		arg.Email,
 		arg.DateOfBirth,
 		arg.Cpf,
-		arg.PhoneID,
 		arg.UpdatedAt,
 	)
 	var i ResponsibleStudent
@@ -53,7 +50,6 @@ func (q *Queries) CreateResponsibleStudent(ctx context.Context, arg CreateRespon
 		&i.Email,
 		&i.DateOfBirth,
 		&i.Cpf,
-		&i.PhoneID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -63,7 +59,7 @@ func (q *Queries) CreateResponsibleStudent(ctx context.Context, arg CreateRespon
 const deleteResponsibleStudent = `-- name: DeleteResponsibleStudent :one
 DELETE FROM "responsibleStudent"
 WHERE id = $1
-RETURNING id, name, gender, email, date_of_birth, cpf, phone_id, created_at, updated_at
+RETURNING id, name, gender, email, date_of_birth, cpf, created_at, updated_at
 `
 
 func (q *Queries) DeleteResponsibleStudent(ctx context.Context, id int64) (ResponsibleStudent, error) {
@@ -76,7 +72,6 @@ func (q *Queries) DeleteResponsibleStudent(ctx context.Context, id int64) (Respo
 		&i.Email,
 		&i.DateOfBirth,
 		&i.Cpf,
-		&i.PhoneID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -84,7 +79,7 @@ func (q *Queries) DeleteResponsibleStudent(ctx context.Context, id int64) (Respo
 }
 
 const getResponsibleStudent = `-- name: GetResponsibleStudent :one
-SELECT id, name, gender, email, date_of_birth, cpf, phone_id, created_at, updated_at FROM "responsibleStudent" 
+SELECT id, name, gender, email, date_of_birth, cpf, created_at, updated_at FROM "responsibleStudent" 
 WHERE id = $1 LIMIT 1
 `
 
@@ -98,7 +93,6 @@ func (q *Queries) GetResponsibleStudent(ctx context.Context, id int64) (Responsi
 		&i.Email,
 		&i.DateOfBirth,
 		&i.Cpf,
-		&i.PhoneID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -106,7 +100,7 @@ func (q *Queries) GetResponsibleStudent(ctx context.Context, id int64) (Responsi
 }
 
 const listResponsibleStudent = `-- name: ListResponsibleStudent :many
-SELECT id, name, gender, email, date_of_birth, cpf, phone_id, created_at, updated_at FROM "responsibleStudent" 
+SELECT id, name, gender, email, date_of_birth, cpf, created_at, updated_at FROM "responsibleStudent" 
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -133,7 +127,6 @@ func (q *Queries) ListResponsibleStudent(ctx context.Context, arg ListResponsibl
 			&i.Email,
 			&i.DateOfBirth,
 			&i.Cpf,
-			&i.PhoneID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -155,7 +148,7 @@ UPDATE "responsibleStudent"
     set name = $2,
     email = $3
 WHERE id = $1
-RETURNING id, name, gender, email, date_of_birth, cpf, phone_id, created_at, updated_at
+RETURNING id, name, gender, email, date_of_birth, cpf, created_at, updated_at
 `
 
 type UpdateResponsibleStudentParams struct {
@@ -174,7 +167,6 @@ func (q *Queries) UpdateResponsibleStudent(ctx context.Context, arg UpdateRespon
 		&i.Email,
 		&i.DateOfBirth,
 		&i.Cpf,
-		&i.PhoneID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

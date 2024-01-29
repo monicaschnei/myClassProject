@@ -16,9 +16,10 @@ INSERT INTO "phone" (
   area_core,
   number,
   type,
-  updated_at
+  updated_at,
+  user_id
 ) VALUES (
-    $1, $2, $3, $4, $5
+    $1, $2, $3, $4, $5, $6
 )
 RETURNING id, country_code, area_core, number, type, created_at, updated_at, user_id
 `
@@ -29,6 +30,7 @@ type CreatePhoneParams struct {
 	Number      int32     `json:"number"`
 	Type        string    `json:"type"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	UserID      int64     `json:"user_id"`
 }
 
 func (q *Queries) CreatePhone(ctx context.Context, arg CreatePhoneParams) (Phone, error) {
@@ -38,6 +40,7 @@ func (q *Queries) CreatePhone(ctx context.Context, arg CreatePhoneParams) (Phone
 		arg.Number,
 		arg.Type,
 		arg.UpdatedAt,
+		arg.UserID,
 	)
 	var i Phone
 	err := row.Scan(

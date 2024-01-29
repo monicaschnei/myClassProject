@@ -13,7 +13,6 @@ import (
 const createSubjectMatterClass = `-- name: CreateSubjectMatterClass :one
 INSERT INTO "subjectMatterClass" (
 "subjectMatter_id",
-professional_id,
 durantion,
 enrollment_date,
 enrollment_time,
@@ -21,16 +20,17 @@ cancellation,
 cancellation_reason,
 student_attendence,
 study_material,
-testing_exam
+testing_exam,
+professional_user_id,
+"student_user_id"
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
 )
-RETURNING id, created_at, "subjectMatter_id", professional_id, durantion, enrollment_date, enrollment_time, cancellation, cancellation_reason, student_attendence, study_material, testing_exam
+RETURNING id, created_at, "subjectMatter_id", durantion, enrollment_date, enrollment_time, cancellation, cancellation_reason, student_attendence, study_material, testing_exam, professional_user_id, student_user_id
 `
 
 type CreateSubjectMatterClassParams struct {
 	SubjectMatterID    int32     `json:"subjectMatter_id"`
-	ProfessionalID     int32     `json:"professional_id"`
 	Durantion          int32     `json:"durantion"`
 	EnrollmentDate     time.Time `json:"enrollment_date"`
 	EnrollmentTime     time.Time `json:"enrollment_time"`
@@ -39,12 +39,13 @@ type CreateSubjectMatterClassParams struct {
 	StudentAttendence  bool      `json:"student_attendence"`
 	StudyMaterial      string    `json:"study_material"`
 	TestingExam        string    `json:"testing_exam"`
+	ProfessionalUserID int64     `json:"professional_user_id"`
+	StudentUserID      int64     `json:"student_user_id"`
 }
 
 func (q *Queries) CreateSubjectMatterClass(ctx context.Context, arg CreateSubjectMatterClassParams) (SubjectMatterClass, error) {
 	row := q.queryRow(ctx, q.createSubjectMatterClassStmt, createSubjectMatterClass,
 		arg.SubjectMatterID,
-		arg.ProfessionalID,
 		arg.Durantion,
 		arg.EnrollmentDate,
 		arg.EnrollmentTime,
@@ -53,13 +54,14 @@ func (q *Queries) CreateSubjectMatterClass(ctx context.Context, arg CreateSubjec
 		arg.StudentAttendence,
 		arg.StudyMaterial,
 		arg.TestingExam,
+		arg.ProfessionalUserID,
+		arg.StudentUserID,
 	)
 	var i SubjectMatterClass
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.SubjectMatterID,
-		&i.ProfessionalID,
 		&i.Durantion,
 		&i.EnrollmentDate,
 		&i.EnrollmentTime,
@@ -68,6 +70,8 @@ func (q *Queries) CreateSubjectMatterClass(ctx context.Context, arg CreateSubjec
 		&i.StudentAttendence,
 		&i.StudyMaterial,
 		&i.TestingExam,
+		&i.ProfessionalUserID,
+		&i.StudentUserID,
 	)
 	return i, err
 }
@@ -75,7 +79,7 @@ func (q *Queries) CreateSubjectMatterClass(ctx context.Context, arg CreateSubjec
 const deleteSubjectMatterClass = `-- name: DeleteSubjectMatterClass :one
 DELETE FROM "subjectMatterClass"
 WHERE id = $1
-RETURNING id, created_at, "subjectMatter_id", professional_id, durantion, enrollment_date, enrollment_time, cancellation, cancellation_reason, student_attendence, study_material, testing_exam
+RETURNING id, created_at, "subjectMatter_id", durantion, enrollment_date, enrollment_time, cancellation, cancellation_reason, student_attendence, study_material, testing_exam, professional_user_id, student_user_id
 `
 
 func (q *Queries) DeleteSubjectMatterClass(ctx context.Context, id int64) (SubjectMatterClass, error) {
@@ -85,7 +89,6 @@ func (q *Queries) DeleteSubjectMatterClass(ctx context.Context, id int64) (Subje
 		&i.ID,
 		&i.CreatedAt,
 		&i.SubjectMatterID,
-		&i.ProfessionalID,
 		&i.Durantion,
 		&i.EnrollmentDate,
 		&i.EnrollmentTime,
@@ -94,12 +97,14 @@ func (q *Queries) DeleteSubjectMatterClass(ctx context.Context, id int64) (Subje
 		&i.StudentAttendence,
 		&i.StudyMaterial,
 		&i.TestingExam,
+		&i.ProfessionalUserID,
+		&i.StudentUserID,
 	)
 	return i, err
 }
 
 const getSubjectMatterClass = `-- name: GetSubjectMatterClass :one
-SELECT id, created_at, "subjectMatter_id", professional_id, durantion, enrollment_date, enrollment_time, cancellation, cancellation_reason, student_attendence, study_material, testing_exam FROM "subjectMatterClass" 
+SELECT id, created_at, "subjectMatter_id", durantion, enrollment_date, enrollment_time, cancellation, cancellation_reason, student_attendence, study_material, testing_exam, professional_user_id, student_user_id FROM "subjectMatterClass" 
 WHERE id = $1 LIMIT 1
 `
 
@@ -110,7 +115,6 @@ func (q *Queries) GetSubjectMatterClass(ctx context.Context, id int64) (SubjectM
 		&i.ID,
 		&i.CreatedAt,
 		&i.SubjectMatterID,
-		&i.ProfessionalID,
 		&i.Durantion,
 		&i.EnrollmentDate,
 		&i.EnrollmentTime,
@@ -119,12 +123,14 @@ func (q *Queries) GetSubjectMatterClass(ctx context.Context, id int64) (SubjectM
 		&i.StudentAttendence,
 		&i.StudyMaterial,
 		&i.TestingExam,
+		&i.ProfessionalUserID,
+		&i.StudentUserID,
 	)
 	return i, err
 }
 
 const listSubjectMatterClass = `-- name: ListSubjectMatterClass :many
-SELECT id, created_at, "subjectMatter_id", professional_id, durantion, enrollment_date, enrollment_time, cancellation, cancellation_reason, student_attendence, study_material, testing_exam FROM "subjectMatterClass" 
+SELECT id, created_at, "subjectMatter_id", durantion, enrollment_date, enrollment_time, cancellation, cancellation_reason, student_attendence, study_material, testing_exam, professional_user_id, student_user_id FROM "subjectMatterClass" 
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -148,7 +154,6 @@ func (q *Queries) ListSubjectMatterClass(ctx context.Context, arg ListSubjectMat
 			&i.ID,
 			&i.CreatedAt,
 			&i.SubjectMatterID,
-			&i.ProfessionalID,
 			&i.Durantion,
 			&i.EnrollmentDate,
 			&i.EnrollmentTime,
@@ -157,6 +162,8 @@ func (q *Queries) ListSubjectMatterClass(ctx context.Context, arg ListSubjectMat
 			&i.StudentAttendence,
 			&i.StudyMaterial,
 			&i.TestingExam,
+			&i.ProfessionalUserID,
+			&i.StudentUserID,
 		); err != nil {
 			return nil, err
 		}
@@ -179,7 +186,7 @@ UPDATE "subjectMatterClass"
     study_material = $5,
     testing_exam = $6
 WHERE id = $1
-RETURNING id, created_at, "subjectMatter_id", professional_id, durantion, enrollment_date, enrollment_time, cancellation, cancellation_reason, student_attendence, study_material, testing_exam
+RETURNING id, created_at, "subjectMatter_id", durantion, enrollment_date, enrollment_time, cancellation, cancellation_reason, student_attendence, study_material, testing_exam, professional_user_id, student_user_id
 `
 
 type UpdateSubjectMatterClassParams struct {
@@ -205,7 +212,6 @@ func (q *Queries) UpdateSubjectMatterClass(ctx context.Context, arg UpdateSubjec
 		&i.ID,
 		&i.CreatedAt,
 		&i.SubjectMatterID,
-		&i.ProfessionalID,
 		&i.Durantion,
 		&i.EnrollmentDate,
 		&i.EnrollmentTime,
@@ -214,6 +220,8 @@ func (q *Queries) UpdateSubjectMatterClass(ctx context.Context, arg UpdateSubjec
 		&i.StudentAttendence,
 		&i.StudyMaterial,
 		&i.TestingExam,
+		&i.ProfessionalUserID,
+		&i.StudentUserID,
 	)
 	return i, err
 }

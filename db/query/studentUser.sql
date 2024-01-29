@@ -6,11 +6,9 @@ INSERT INTO "studentUser" (
     date_of_birth,
     gender,
     responsible_student_id,
-    updated_at,
-    "subjectMatter_class_id",
-    calendar_id
+    updated_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9
+    $1, $2, $3, $4, $5, $6, $7
 )
 RETURNING *;
 
@@ -30,8 +28,7 @@ UPDATE "studentUser"
     set username = $2,
     password = $3,
     name = $4,
-    responsible_student_id = $5,
-    "subjectMatter_class_id"  = $6
+    responsible_student_id = $5
 WHERE id = $1
 RETURNING *;
 

@@ -172,19 +172,13 @@ func (q *Queries) ListProfessionalInformation(ctx context.Context, arg ListProfe
 }
 
 const listProfessionalInformationByUser = `-- name: ListProfessionalInformationByUser :many
-SELECT id, experience_period, ocupation_area, university, graduation_diploma, validate, graduation_country, graduation_city, graduation_state, created_at, updated_at, professional_user_id FROM "professionalInformation"
+SELECT id, experience_period, ocupation_area, university, graduation_diploma, validate, graduation_country, graduation_city, graduation_state, created_at, updated_at, professional_user_id
+FROM "professionalInformation"
 WHERE professional_user_id = $1
-LIMIT $1
-OFFSET $2
 `
 
-type ListProfessionalInformationByUserParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
-
-func (q *Queries) ListProfessionalInformationByUser(ctx context.Context, arg ListProfessionalInformationByUserParams) ([]ProfessionalInformation, error) {
-	rows, err := q.query(ctx, q.listProfessionalInformationByUserStmt, listProfessionalInformationByUser, arg.Limit, arg.Offset)
+func (q *Queries) ListProfessionalInformationByUser(ctx context.Context, professionalUserID int64) ([]ProfessionalInformation, error) {
+	rows, err := q.query(ctx, q.listProfessionalInformationByUserStmt, listProfessionalInformationByUser, professionalUserID)
 	if err != nil {
 		return nil, err
 	}

@@ -8,16 +8,6 @@ import (
 	"time"
 )
 
-type Calendar struct {
-	ID                 int64     `json:"id"`
-	SubjectMatterID    int32     `json:"subjectMatter_id"`
-	Time               time.Time `json:"time"`
-	Date               time.Time `json:"date"`
-	Available          bool      `json:"available"`
-	FilledStudentID    int32     `json:"filled_student_id"`
-	ProfessionalUserID int32     `json:"professionalUser_id"`
-}
-
 type Phone struct {
 	ID          int64     `json:"id"`
 	CountryCode int32     `json:"country_code"`
@@ -45,21 +35,18 @@ type ProfessionalInformation struct {
 }
 
 type ProfessionalUser struct {
-	ID                   int64     `json:"id"`
-	CreatedAt            time.Time `json:"created_at"`
-	Name                 string    `json:"name"`
-	Username             string    `json:"username"`
-	Password             string    `json:"password"`
-	Gender               string    `json:"gender"`
-	Email                string    `json:"email"`
-	DateOfBirth          time.Time `json:"date_of_birth"`
-	Cpf                  int32     `json:"cpf"`
-	ImageID              int64     `json:"image_id"`
-	UpdatedAt            time.Time `json:"updated_at"`
-	SubjectMatterID      int32     `json:"subjectMatter_id"`
-	SubjectMatterClassID int32     `json:"subjectMatter_class_id"`
-	ClassHourPrice       string    `json:"class_hour_price"`
-	CalendarID           int32     `json:"calendar_id"`
+	ID             int64     `json:"id"`
+	CreatedAt      time.Time `json:"created_at"`
+	Name           string    `json:"name"`
+	Username       string    `json:"username"`
+	Password       string    `json:"password"`
+	Gender         string    `json:"gender"`
+	Email          string    `json:"email"`
+	DateOfBirth    time.Time `json:"date_of_birth"`
+	Cpf            int32     `json:"cpf"`
+	ImageID        int64     `json:"image_id"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	ClassHourPrice string    `json:"class_hour_price"`
 }
 
 type ProfessionalUserSubjectMatter struct {
@@ -74,7 +61,6 @@ type ResponsibleStudent struct {
 	Email       string    `json:"email"`
 	DateOfBirth time.Time `json:"date_of_birth"`
 	Cpf         int32     `json:"cpf"`
-	PhoneID     int64     `json:"phone_id"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
@@ -89,8 +75,6 @@ type StudentUser struct {
 	CreatedAt            time.Time `json:"created_at"`
 	ResponsibleStudentID int32     `json:"responsible_student_id"`
 	UpdatedAt            time.Time `json:"updated_at"`
-	SubjectMatterClassID int32     `json:"subjectMatter_class_id"`
-	CalendarID           int32     `json:"calendar_id"`
 }
 
 type SubjectMatter struct {
@@ -101,16 +85,10 @@ type SubjectMatter struct {
 	Abstract  string    `json:"abstract"`
 }
 
-type SubjectMatterCalendar struct {
-	SubjectMatterID int64 `json:"subjectMatter_id"`
-	CalendarID      int64 `json:"calendar_id"`
-}
-
 type SubjectMatterClass struct {
 	ID                 int64     `json:"id"`
 	CreatedAt          time.Time `json:"created_at"`
 	SubjectMatterID    int32     `json:"subjectMatter_id"`
-	ProfessionalID     int32     `json:"professional_id"`
 	Durantion          int32     `json:"durantion"`
 	EnrollmentDate     time.Time `json:"enrollment_date"`
 	EnrollmentTime     time.Time `json:"enrollment_time"`
@@ -119,4 +97,6 @@ type SubjectMatterClass struct {
 	StudentAttendence  bool      `json:"student_attendence"`
 	StudyMaterial      string    `json:"study_material"`
 	TestingExam        string    `json:"testing_exam"`
+	ProfessionalUserID int64     `json:"professional_user_id"`
+	StudentUserID      int64     `json:"student_user_id"`
 }

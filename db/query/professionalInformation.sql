@@ -26,10 +26,9 @@ LIMIT $1
 OFFSET $2;
 
 -- name: ListProfessionalInformationByUser :many
-SELECT * FROM "professionalInformation"
-WHERE professional_user_id = $1
-LIMIT $1
-OFFSET $2;
+SELECT *
+FROM "professionalInformation"
+WHERE professional_user_id = $1;
 
 -- name: UpdateProfessionalInformation :one
 UPDATE "professionalInformation"

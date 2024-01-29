@@ -18,13 +18,11 @@ INSERT INTO "studentUser" (
     date_of_birth,
     gender,
     responsible_student_id,
-    updated_at,
-    "subjectMatter_class_id",
-    calendar_id
+    updated_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9
+    $1, $2, $3, $4, $5, $6, $7
 )
-RETURNING id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at, "subjectMatter_class_id", calendar_id
+RETURNING id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at
 `
 
 type CreateStudentUserParams struct {
@@ -35,8 +33,6 @@ type CreateStudentUserParams struct {
 	Gender               string    `json:"gender"`
 	ResponsibleStudentID int32     `json:"responsible_student_id"`
 	UpdatedAt            time.Time `json:"updated_at"`
-	SubjectMatterClassID int32     `json:"subjectMatter_class_id"`
-	CalendarID           int32     `json:"calendar_id"`
 }
 
 func (q *Queries) CreateStudentUser(ctx context.Context, arg CreateStudentUserParams) (StudentUser, error) {
@@ -48,8 +44,6 @@ func (q *Queries) CreateStudentUser(ctx context.Context, arg CreateStudentUserPa
 		arg.Gender,
 		arg.ResponsibleStudentID,
 		arg.UpdatedAt,
-		arg.SubjectMatterClassID,
-		arg.CalendarID,
 	)
 	var i StudentUser
 	err := row.Scan(
@@ -62,8 +56,6 @@ func (q *Queries) CreateStudentUser(ctx context.Context, arg CreateStudentUserPa
 		&i.CreatedAt,
 		&i.ResponsibleStudentID,
 		&i.UpdatedAt,
-		&i.SubjectMatterClassID,
-		&i.CalendarID,
 	)
 	return i, err
 }
@@ -71,7 +63,7 @@ func (q *Queries) CreateStudentUser(ctx context.Context, arg CreateStudentUserPa
 const deleteStudentUser = `-- name: DeleteStudentUser :one
 DELETE FROM "studentUser"
 WHERE id = $1
-RETURNING id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at, "subjectMatter_class_id", calendar_id
+RETURNING id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at
 `
 
 func (q *Queries) DeleteStudentUser(ctx context.Context, id int64) (StudentUser, error) {
@@ -87,14 +79,12 @@ func (q *Queries) DeleteStudentUser(ctx context.Context, id int64) (StudentUser,
 		&i.CreatedAt,
 		&i.ResponsibleStudentID,
 		&i.UpdatedAt,
-		&i.SubjectMatterClassID,
-		&i.CalendarID,
 	)
 	return i, err
 }
 
 const getStudentUser = `-- name: GetStudentUser :one
-SELECT id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at, "subjectMatter_class_id", calendar_id FROM "studentUser" 
+SELECT id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at FROM "studentUser" 
 WHERE id = $1 LIMIT 1
 `
 
@@ -111,14 +101,12 @@ func (q *Queries) GetStudentUser(ctx context.Context, id int64) (StudentUser, er
 		&i.CreatedAt,
 		&i.ResponsibleStudentID,
 		&i.UpdatedAt,
-		&i.SubjectMatterClassID,
-		&i.CalendarID,
 	)
 	return i, err
 }
 
 const listStudentUser = `-- name: ListStudentUser :many
-SELECT id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at, "subjectMatter_class_id", calendar_id FROM "studentUser" 
+SELECT id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at FROM "studentUser" 
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -148,8 +136,6 @@ func (q *Queries) ListStudentUser(ctx context.Context, arg ListStudentUserParams
 			&i.CreatedAt,
 			&i.ResponsibleStudentID,
 			&i.UpdatedAt,
-			&i.SubjectMatterClassID,
-			&i.CalendarID,
 		); err != nil {
 			return nil, err
 		}
@@ -169,10 +155,9 @@ UPDATE "studentUser"
     set username = $2,
     password = $3,
     name = $4,
-    responsible_student_id = $5,
-    "subjectMatter_class_id"  = $6
+    responsible_student_id = $5
 WHERE id = $1
-RETURNING id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at, "subjectMatter_class_id", calendar_id
+RETURNING id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at
 `
 
 type UpdateStudentUserParams struct {
@@ -181,7 +166,6 @@ type UpdateStudentUserParams struct {
 	Password             string `json:"password"`
 	Name                 string `json:"name"`
 	ResponsibleStudentID int32  `json:"responsible_student_id"`
-	SubjectMatterClassID int32  `json:"subjectMatter_class_id"`
 }
 
 func (q *Queries) UpdateStudentUser(ctx context.Context, arg UpdateStudentUserParams) (StudentUser, error) {
@@ -191,7 +175,6 @@ func (q *Queries) UpdateStudentUser(ctx context.Context, arg UpdateStudentUserPa
 		arg.Password,
 		arg.Name,
 		arg.ResponsibleStudentID,
-		arg.SubjectMatterClassID,
 	)
 	var i StudentUser
 	err := row.Scan(
@@ -204,8 +187,6 @@ func (q *Queries) UpdateStudentUser(ctx context.Context, arg UpdateStudentUserPa
 		&i.CreatedAt,
 		&i.ResponsibleStudentID,
 		&i.UpdatedAt,
-		&i.SubjectMatterClassID,
-		&i.CalendarID,
 	)
 	return i, err
 }

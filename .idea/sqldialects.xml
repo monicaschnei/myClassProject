@@ -3,8 +3,12 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/db/migration/000001_init_schema.up.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/db/query/calendar.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db/query/phone.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db/query/professionalInformation.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/db/query/professionalUser.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db/query/responsibleStudent.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db/query/studentUser.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db/query/subjectMatter.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db/query/subjectMatterClass.sql" dialect="PostgreSQL" />
   </component>
 </project>

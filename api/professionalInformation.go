@@ -94,20 +94,28 @@ type listProfessionalInformationsRequest struct {
 
 func (server *Server) listAllProfessionalInformationsByUser(ctx *gin.Context) {
 	var req listProfessionalInformationsRequest
+	var reqUser professionalUserId
+
+	if err := ctx.ShouldBindUri(&reqUser); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	professionalUser, err := server.store.GetProfessionalUser(ctx, reqUser.ID)
+
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusNotFound, "This user does not exists, please create it firstly")
+		return
+	}
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	arg := db.ListProfessionalInformationByUserParams{
-		Limit:  req.PageSize,
-		Offset: (req.PageID - 1) * req.PageSize,
-	}
-
-	professionalUsers, err := server.store.ListProfessionalInformationByUser(ctx, arg)
+	professionalInformationsByUser, err := server.store.ListProfessionalInformationByUser(ctx, professionalUser.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, professionalUsers)
+	ctx.JSON(http.StatusOK, professionalInformationsByUser)
 }
