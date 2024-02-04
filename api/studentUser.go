@@ -14,8 +14,7 @@ type createStudentUserRequest struct {
 	Name                 string    `json:"name"`
 	DateOfBirth          time.Time `json:"date_of_birth"`
 	Gender               string    `json:"gender"`
-	ResponsibleStudentID int32     `json:"responsible_student_id"`
-	UpdatedAt            time.Time `json:"updated_at"`
+	ResponsibleStudentID int64     `json:"responsible_student_id"`
 }
 
 func (server *Server) createStudentUser(ctx *gin.Context) {
@@ -24,14 +23,26 @@ func (server *Server) createStudentUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-
+	var reqResponsible getResponsibleStudentlUserRequest
+	if err := ctx.ShouldBindUri(&reqResponsible); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	responsibleStudentUser, err := server.store.GetResponsibleStudent(ctx, reqResponsible.ID)
+	fmt.Println("reqResponsible", reqResponsible)
+	fmt.Println("responsibleStudentUser", responsibleStudentUser)
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusNotFound, "This user does not exists, please create it firstly")
+		return
+	}
 	arg := db.CreateStudentUserParams{
-		Name:        req.Name,
-		Username:    req.Username,
-		Password:    req.Password,
-		Gender:      req.Gender,
-		DateOfBirth: req.DateOfBirth,
-		UpdatedAt:   req.UpdatedAt,
+		Username:             req.Username,
+		Password:             req.Password,
+		Name:                 req.Name,
+		DateOfBirth:          req.DateOfBirth,
+		Gender:               req.Gender,
+		ResponsibleStudentID: responsibleStudentUser.ID,
 	}
 
 	studentUser, err := server.store.CreateStudentUser(ctx, arg)
@@ -93,7 +104,6 @@ type updateStudentlUser struct {
 	DateOfBirth          time.Time `json:"date_of_birth"`
 	Gender               string    `json:"gender"`
 	ResponsibleStudentID int32     `json:"responsible_student_id"`
-	UpdatedAt            time.Time `json:"updated_at"`
 }
 
 func (server *Server) updateStudentlUser(ctx *gin.Context) {

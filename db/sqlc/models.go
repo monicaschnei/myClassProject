@@ -73,7 +73,7 @@ type StudentUser struct {
 	DateOfBirth          time.Time `json:"date_of_birth"`
 	Gender               string    `json:"gender"`
 	CreatedAt            time.Time `json:"created_at"`
-	ResponsibleStudentID int32     `json:"responsible_student_id"`
+	ResponsibleStudentID int64     `json:"responsible_student_id"`
 	UpdatedAt            time.Time `json:"updated_at"`
 }
 

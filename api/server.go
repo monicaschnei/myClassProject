@@ -26,7 +26,7 @@ func NewServer(store db.Store) *Server {
 	router.GET("/listProfessionalInformations/:id", server.listAllProfessionalInformationsByUser)
 	router.PUT("/professionalInformations/:id", server.updateProfessionalInformation)
 	//studentUser
-	router.POST("/studentUser", server.createStudentUser)
+	router.POST("/studentUser/:id", server.createStudentUser)
 	router.GET("/studentUser/:id", server.getStudentUserById)
 	router.GET("/listStudentUsers", server.listAllStudentUsers)
 	router.PUT("/studentUser/:id", server.updateStudentlUser)

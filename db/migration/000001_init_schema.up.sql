@@ -47,7 +47,7 @@ CREATE TABLE "studentUser" (
   "gender" varchar NOT NULL,
   "created_at" timestamp 
    DEFAULT (now()) NOT NULL,
-  "responsible_student_id" integer UNIQUE NOT NULL,
+  "responsible_student_id" bigserial NOT NULL,
   "updated_at" timestamp 
    DEFAULT (now()) NOT NULL
 );

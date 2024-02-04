@@ -26,10 +26,9 @@ func (server *Server) createResponsibleStudent(ctx *gin.Context) {
 	arg := db.CreateResponsibleStudentParams{
 		Name:        req.Name,
 		Gender:      req.Gender,
-		DateOfBirth: req.DateOfBirth,
 		Email:       req.Email,
+		DateOfBirth: req.DateOfBirth,
 		Cpf:         req.Cpf,
-		UpdatedAt:   time.Now(),
 	}
 
 	responsibleStudent, err := server.store.CreateResponsibleStudent(ctx, arg)

@@ -17,10 +17,9 @@ INSERT INTO "studentUser" (
     name,
     date_of_birth,
     gender,
-    responsible_student_id,
-    updated_at
+    responsible_student_id
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7
+    $1, $2, $3, $4, $5, $6
 )
 RETURNING id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at
 `
@@ -31,8 +30,7 @@ type CreateStudentUserParams struct {
 	Name                 string    `json:"name"`
 	DateOfBirth          time.Time `json:"date_of_birth"`
 	Gender               string    `json:"gender"`
-	ResponsibleStudentID int32     `json:"responsible_student_id"`
-	UpdatedAt            time.Time `json:"updated_at"`
+	ResponsibleStudentID int64     `json:"responsible_student_id"`
 }
 
 func (q *Queries) CreateStudentUser(ctx context.Context, arg CreateStudentUserParams) (StudentUser, error) {
@@ -43,7 +41,6 @@ func (q *Queries) CreateStudentUser(ctx context.Context, arg CreateStudentUserPa
 		arg.DateOfBirth,
 		arg.Gender,
 		arg.ResponsibleStudentID,
-		arg.UpdatedAt,
 	)
 	var i StudentUser
 	err := row.Scan(
@@ -165,7 +162,7 @@ type UpdateStudentUserParams struct {
 	Username             string `json:"username"`
 	Password             string `json:"password"`
 	Name                 string `json:"name"`
-	ResponsibleStudentID int32  `json:"responsible_student_id"`
+	ResponsibleStudentID int64  `json:"responsible_student_id"`
 }
 
 func (q *Queries) UpdateStudentUser(ctx context.Context, arg UpdateStudentUserParams) (StudentUser, error) {

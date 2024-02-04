@@ -5,10 +5,9 @@ INSERT INTO "studentUser" (
     name,
     date_of_birth,
     gender,
-    responsible_student_id,
-    updated_at
+    responsible_student_id
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7
+    $1, $2, $3, $4, $5, $6
 )
 RETURNING *;
 
