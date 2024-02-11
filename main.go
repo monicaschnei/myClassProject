@@ -2,12 +2,12 @@ package main
 
 import (
 	"database/sql"
+	_ "github.com/golang/mock/mockgen/model"
+	_ "github.com/lib/pq"
 	"log"
 	"myclass/api"
 	db "myclass/db/sqlc"
 	"myclass/util"
-
-	_ "github.com/lib/pq"
 )
 
 func main() {
