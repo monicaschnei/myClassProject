@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/exp/rand"
 	"io/ioutil"
 	mockdb "myclass/db/mock"
 	db "myclass/db/sqlc"
@@ -15,6 +16,31 @@ import (
 	"testing"
 	"time"
 )
+
+func TestCreateProfessionalUserAPI(t *testing.T) {
+	professionalUser := randomProfessionalUserCreate()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	store := mockdb.NewMockStore(ctrl)
+	store.EXPECT().
+		CreateProfessionalUser(gomock.Any(), gomock.Eq(professionalUser)).
+		Return(professionalUser, nil)
+
+	//start test server and send request
+	server := NewServer(store)
+	recorder := httptest.NewRecorder()
+
+	url := fmt.Sprintf("/professionalUser")
+	body := getBodyReader(professionalUser)
+	request, err := http.NewRequest(http.MethodPost, url, &body)
+
+	require.NoError(t, err)
+	server.router.ServeHTTP(recorder, request)
+
+	require.Equal(t, http.StatusOK, recorder.Code)
+
+}
 
 func TestGetProfessionalUserAPI(t *testing.T) {
 	professionalUser := randomProfessionalUser()
@@ -118,6 +144,24 @@ func randomProfessionalUser() db.ProfessionalUser {
 	}
 }
 
+func randomProfessionalUserCreate() db.ProfessionalUser {
+	return db.ProfessionalUser{
+		ID:       randomID(10, 40),
+		Name:     "Monica",
+		Username: "monica",
+		Password: "passwordMonica",
+		Gender:   "female",
+		Email:    "monica@gmail.com",
+		DateOfBirth: time.Date(
+			2009, 11, 17, 20, 34, 58, 651387237, time.UTC),
+		Cpf:     123654,
+		ImageID: 2,
+		UpdatedAt: time.Date(
+			2024, 01, 17, 20, 34, 58, 651387237, time.UTC),
+		ClassHourPrice: "20",
+	}
+}
+
 func requireBodyProfessionalUser(t *testing.T, body *bytes.Buffer, professionalUser db.ProfessionalUser) {
 	data, err := ioutil.ReadAll(body)
 	require.NoError(t, err)
@@ -126,4 +170,15 @@ func requireBodyProfessionalUser(t *testing.T, body *bytes.Buffer, professionalU
 	err = json.Unmarshal(data, &gotProfessionalUser)
 	require.NoError(t, err)
 	require.Equal(t, gotProfessionalUser, professionalUser)
+}
+
+func getBodyReader(iface interface{}) bytes.Buffer {
+	buffer := new(bytes.Buffer)
+	json.NewEncoder(buffer).Encode(iface)
+	return *buffer
+}
+
+func randomID(min, max int64) int64 {
+	return min + rand.Int63n(max-min+1)
+
 }
