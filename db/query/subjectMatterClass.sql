@@ -1,7 +1,6 @@
 -- name: CreateSubjectMatterClass :one
 INSERT INTO "subjectMatterClass" (
 "subjectMatter_id",
-professional_id,
 durantion,
 enrollment_date,
 enrollment_time,
@@ -9,9 +8,11 @@ cancellation,
 cancellation_reason,
 student_attendence,
 study_material,
-testing_exam
+testing_exam,
+professional_user_id,
+"student_user_id"
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
 )
 RETURNING *;
 
