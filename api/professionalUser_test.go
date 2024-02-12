@@ -2,10 +2,12 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 	"io/ioutil"
@@ -18,28 +20,49 @@ import (
 )
 
 func TestCreateProfessionalUserAPI(t *testing.T) {
+	//create a new controller
 	professionalUser := randomProfessionalUserCreate()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	store := mockdb.NewMockStore(ctrl)
-	store.EXPECT().
-		CreateProfessionalUser(gomock.Any(), gomock.Eq(professionalUser)).
-		Return(professionalUser, nil)
+	//create a mock object for the Store interface
+	mockStore := mockdb.NewMockStore(ctrl)
+
+	req := db.CreateProfessionalUserParams{
+		Name:     "Monica",
+		Username: "monica",
+		Password: "passwordMonica",
+		Gender:   "female",
+		Email:    "monica@gmail.com",
+		DateOfBirth: time.Date(
+			2009, 11, 17, 20, 34, 58, 651387237, time.UTC),
+		Cpf:            123654,
+		ImageID:        2,
+		ClassHourPrice: "20",
+	}
+
+	//set expectations
+	mockStore.EXPECT().
+		CreateProfessionalUser(gomock.Any(), gomock.Any()).AnyTimes().
+		DoAndReturn(func(ctx context.Context, arg db.CreateProfessionalUserParams) (*db.ProfessionalUser, error) {
+			assert.NotZero(t, arg.UpdatedAt)
+			return &professionalUser, nil
+
+		})
 
 	//start test server and send request
-	server := NewServer(store)
+	server := NewServer(mockStore)
 	recorder := httptest.NewRecorder()
 
 	url := fmt.Sprintf("/professionalUser")
-	body := getBodyReader(professionalUser)
+	body := getBodyReader(req)
 	request, err := http.NewRequest(http.MethodPost, url, &body)
 
 	require.NoError(t, err)
 	server.router.ServeHTTP(recorder, request)
 
 	require.Equal(t, http.StatusOK, recorder.Code)
-
+	requireBodyProfessionalUser(t, recorder.Body, &professionalUser)
 }
 
 func TestGetProfessionalUserAPI(t *testing.T) {
@@ -61,7 +84,7 @@ func TestGetProfessionalUserAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				requireBodyProfessionalUser(t, recorder.Body, professionalUser)
+				requireBodyProfessionalUser(t, recorder.Body, &professionalUser)
 			},
 		},
 		{
@@ -146,23 +169,23 @@ func randomProfessionalUser() db.ProfessionalUser {
 
 func randomProfessionalUserCreate() db.ProfessionalUser {
 	return db.ProfessionalUser{
-		ID:       randomID(10, 40),
-		Name:     "Monica",
-		Username: "monica",
-		Password: "passwordMonica",
-		Gender:   "female",
-		Email:    "monica@gmail.com",
+		ID:        randomID(10, 40),
+		CreatedAt: time.Now(),
+		Name:      "Monica",
+		Username:  "monica",
+		Password:  "passwordMonica",
+		Gender:    "female",
+		Email:     "monica@gmail.com",
 		DateOfBirth: time.Date(
 			2009, 11, 17, 20, 34, 58, 651387237, time.UTC),
-		Cpf:     123654,
-		ImageID: 2,
-		UpdatedAt: time.Date(
-			2024, 01, 17, 20, 34, 58, 651387237, time.UTC),
+		Cpf:            123654,
+		ImageID:        2,
+		UpdatedAt:      time.Now(),
 		ClassHourPrice: "20",
 	}
 }
 
-func requireBodyProfessionalUser(t *testing.T, body *bytes.Buffer, professionalUser db.ProfessionalUser) {
+func requireBodyProfessionalUser(t *testing.T, body *bytes.Buffer, professionalUser *db.ProfessionalUser) {
 	data, err := ioutil.ReadAll(body)
 	require.NoError(t, err)
 
@@ -174,7 +197,7 @@ func requireBodyProfessionalUser(t *testing.T, body *bytes.Buffer, professionalU
 
 func getBodyReader(iface interface{}) bytes.Buffer {
 	buffer := new(bytes.Buffer)
-	json.NewEncoder(buffer).Encode(iface)
+	_ = json.NewEncoder(buffer).Encode(iface)
 	return *buffer
 }
 
