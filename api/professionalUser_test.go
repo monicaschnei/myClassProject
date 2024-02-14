@@ -44,9 +44,9 @@ func TestCreateProfessionalUserAPI(t *testing.T) {
 	//set expectations
 	mockStore.EXPECT().
 		CreateProfessionalUser(gomock.Any(), gomock.Any()).AnyTimes().
-		DoAndReturn(func(ctx context.Context, arg db.CreateProfessionalUserParams) (*db.ProfessionalUser, error) {
+		DoAndReturn(func(ctx context.Context, arg db.CreateProfessionalUserParams) (db.ProfessionalUser, error) {
 			assert.NotZero(t, arg.UpdatedAt)
-			return &professionalUser, nil
+			return professionalUser, nil
 
 		})
 
@@ -62,7 +62,7 @@ func TestCreateProfessionalUserAPI(t *testing.T) {
 	server.router.ServeHTTP(recorder, request)
 
 	require.Equal(t, http.StatusOK, recorder.Code)
-	requireBodyProfessionalUser(t, recorder.Body, &professionalUser)
+	requireBodyProfessionalUser(t, recorder.Body, professionalUser)
 }
 
 func TestGetProfessionalUserAPI(t *testing.T) {
@@ -84,7 +84,7 @@ func TestGetProfessionalUserAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				requireBodyProfessionalUser(t, recorder.Body, &professionalUser)
+				requireBodyProfessionalUser(t, recorder.Body, professionalUser)
 			},
 		},
 		{
@@ -169,23 +169,25 @@ func randomProfessionalUser() db.ProfessionalUser {
 
 func randomProfessionalUserCreate() db.ProfessionalUser {
 	return db.ProfessionalUser{
-		ID:        randomID(10, 40),
-		CreatedAt: time.Now(),
-		Name:      "Monica",
-		Username:  "monica",
-		Password:  "passwordMonica",
-		Gender:    "female",
-		Email:     "monica@gmail.com",
+		ID: randomID(10, 40),
+		CreatedAt: time.Date(
+			2024, 01, 17, 20, 34, 58, 651387237, time.UTC),
+		Name:     "Monica",
+		Username: "monica",
+		Password: "passwordMonica",
+		Gender:   "female",
+		Email:    "monica@gmail.com",
 		DateOfBirth: time.Date(
 			2009, 11, 17, 20, 34, 58, 651387237, time.UTC),
-		Cpf:            123654,
-		ImageID:        2,
-		UpdatedAt:      time.Now(),
+		Cpf:     123654,
+		ImageID: 2,
+		UpdatedAt: time.Date(
+			2024, 01, 17, 20, 34, 58, 651387237, time.UTC),
 		ClassHourPrice: "20",
 	}
 }
 
-func requireBodyProfessionalUser(t *testing.T, body *bytes.Buffer, professionalUser *db.ProfessionalUser) {
+func requireBodyProfessionalUser(t *testing.T, body *bytes.Buffer, professionalUser db.ProfessionalUser) {
 	data, err := ioutil.ReadAll(body)
 	require.NoError(t, err)
 
