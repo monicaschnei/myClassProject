@@ -378,6 +378,43 @@ func TestUpdateProfessionalUserAPI(t *testing.T) {
 	require.NoError(t, err)
 	server.router.ServeHTTP(recorder, request2)
 	require.Equal(t, http.StatusOK, recorder.Code)
+	requireBodyProfessionalUser(t, recorder.Body, existedProfessionalUser)
+}
+func TestDeleteProfessionalUserAPI(t *testing.T) {
+	existedProfessionalUser := randomProfessionalUser()
+	//create a new controller
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	//create a mock object for the Store interface
+	mockStore := mockdb.NewMockStore(ctrl)
+
+	//set expectations
+
+	mockStore.EXPECT().
+		GetProfessionalUser(gomock.Any(), gomock.Eq(existedProfessionalUser.ID)).AnyTimes().
+		Return(existedProfessionalUser, nil)
+
+	mockStore.EXPECT().
+		DeleteProfessionalUser(gomock.Any(), gomock.Eq(existedProfessionalUser.ID)).AnyTimes().
+		Return(db.ProfessionalUser{}, nil)
+
+	//start test server and send request
+	server := NewServer(mockStore)
+	recorder := httptest.NewRecorder()
+	url1 := fmt.Sprintf("/professionalUser/1")
+	request1, err := http.NewRequest(http.MethodGet, url1, nil)
+
+	require.NoError(t, err)
+	server.router.ServeHTTP(recorder, request1)
+	require.Equal(t, http.StatusOK, recorder.Code)
+
+	url := fmt.Sprintf("/professionalUser/1")
+	request2, err := http.NewRequest(http.MethodDelete, url, nil)
+
+	require.NoError(t, err)
+	server.router.ServeHTTP(recorder, request2)
+	require.Equal(t, http.StatusOK, recorder.Code)
 }
 
 func randomProfessionalUser() db.ProfessionalUser {
