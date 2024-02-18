@@ -229,6 +229,105 @@ func TestGetProfessionalUserAPI(t *testing.T) {
 		})
 	}
 }
+func TestListAllProfessionalUserAPI(t *testing.T) {
+	//create a new controller
+	professionalUsers := randomProfessionalUsers()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	//create a mock object for the Store interface
+	mockStore := mockdb.NewMockStore(ctrl)
+
+	//set expectations
+	mockStore.EXPECT().
+		ListProfessionalUser(gomock.Any(), gomock.Any()).AnyTimes().
+		DoAndReturn(func(ctx context.Context, arg db.ListProfessionalUserParams) ([]db.ProfessionalUser, error) {
+			return professionalUsers, nil
+
+		})
+
+	//start test server and send request
+	server := NewServer(mockStore)
+	recorder := httptest.NewRecorder()
+
+	url := fmt.Sprintf("/professionalUsers")
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	q := request.URL.Query()
+	q.Add("page_id", "1")
+	q.Add("page_size", "5")
+	request.URL.RawQuery = q.Encode()
+
+	require.NoError(t, err)
+	server.router.ServeHTTP(recorder, request)
+
+	require.Equal(t, http.StatusOK, recorder.Code)
+	requireBodyListProfessionalUser(t, recorder.Body, professionalUsers)
+}
+func TestListAllProfessionalUserAPIBadRequest(t *testing.T) {
+	//create a new controller
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	//create a mock object for the Store interface
+	mockStore := mockdb.NewMockStore(ctrl)
+
+	//set expectations
+	mockStore.EXPECT().
+		ListProfessionalUser(gomock.Any(), gomock.Any()).AnyTimes().
+		DoAndReturn(func(ctx context.Context, arg db.ListProfessionalUserParams) ([]db.ProfessionalUser, error) {
+			return []db.ProfessionalUser{}, errors.New("Internal Server Error")
+
+		})
+
+	//start test server and send request
+	server := NewServer(mockStore)
+	recorder := httptest.NewRecorder()
+
+	url := fmt.Sprintf("/professionalUsers")
+
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	q := request.URL.Query()
+	q.Add("pageID", "1")
+	q.Add("page_size", "5")
+	request.URL.RawQuery = q.Encode()
+	require.NoError(t, err)
+	server.router.ServeHTTP(recorder, request)
+
+	require.Equal(t, http.StatusBadRequest, recorder.Code)
+}
+
+func TestListAllProfessionalUserAPIInternalServerError(t *testing.T) {
+	//create a new controller
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	//create a mock object for the Store interface
+	mockStore := mockdb.NewMockStore(ctrl)
+
+	//set expectations
+	mockStore.EXPECT().
+		ListProfessionalUser(gomock.Any(), gomock.Any()).AnyTimes().
+		DoAndReturn(func(ctx context.Context, arg db.ListProfessionalUserParams) ([]db.ProfessionalUser, error) {
+			return []db.ProfessionalUser{}, errors.New("Internal Server Error")
+
+		})
+
+	//start test server and send request
+	server := NewServer(mockStore)
+	recorder := httptest.NewRecorder()
+
+	url := fmt.Sprintf("/professionalUsers")
+
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	q := request.URL.Query()
+	q.Add("page_id", "9")
+	q.Add("page_size", "5")
+	request.URL.RawQuery = q.Encode()
+	require.NoError(t, err)
+	server.router.ServeHTTP(recorder, request)
+
+	require.Equal(t, http.StatusInternalServerError, recorder.Code)
+}
 
 func randomProfessionalUser() db.ProfessionalUser {
 	return db.ProfessionalUser{
@@ -270,11 +369,44 @@ func randomProfessionalUserCreate() db.ProfessionalUser {
 	}
 }
 
+func randomProfessionalUsers() []db.ProfessionalUser {
+	professionalUserList := make([]db.ProfessionalUser, 5)
+	professionalUser := db.ProfessionalUser{
+		ID: randomID(10, 40),
+		CreatedAt: time.Date(
+			2024, 01, 17, 20, 34, 58, 651387237, time.UTC),
+		Name:     "Monica",
+		Username: "monica",
+		Password: "passwordMonica",
+		Gender:   "female",
+		Email:    "monica@gmail.com",
+		DateOfBirth: time.Date(
+			2009, 11, 17, 20, 34, 58, 651387237, time.UTC),
+		Cpf:     123654,
+		ImageID: 2,
+		UpdatedAt: time.Date(
+			2024, 01, 17, 20, 34, 58, 651387237, time.UTC),
+		ClassHourPrice: "20",
+	}
+	professionalUserList = append(professionalUserList, professionalUser)
+	return professionalUserList
+}
+
 func requireBodyProfessionalUser(t *testing.T, body *bytes.Buffer, professionalUser db.ProfessionalUser) {
 	data, err := ioutil.ReadAll(body)
 	require.NoError(t, err)
 
 	var gotProfessionalUser db.ProfessionalUser
+	err = json.Unmarshal(data, &gotProfessionalUser)
+	require.NoError(t, err)
+	require.Equal(t, gotProfessionalUser, professionalUser)
+}
+
+func requireBodyListProfessionalUser(t *testing.T, body *bytes.Buffer, professionalUser []db.ProfessionalUser) {
+	data, err := ioutil.ReadAll(body)
+	require.NoError(t, err)
+
+	var gotProfessionalUser []db.ProfessionalUser
 	err = json.Unmarshal(data, &gotProfessionalUser)
 	require.NoError(t, err)
 	require.Equal(t, gotProfessionalUser, professionalUser)
