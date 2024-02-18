@@ -329,6 +329,57 @@ func TestListAllProfessionalUserAPIInternalServerError(t *testing.T) {
 	require.Equal(t, http.StatusInternalServerError, recorder.Code)
 }
 
+func TestUpdateProfessionalUserAPI(t *testing.T) {
+	existedProfessionalUser := randomProfessionalUser()
+	//create a new controller
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	//create a mock object for the Store interface
+	mockStore := mockdb.NewMockStore(ctrl)
+
+	req := gin.H{
+		"Name":           "Maria",
+		"Password":       existedProfessionalUser.Password,
+		"Gender":         existedProfessionalUser.Gender,
+		"Email":          existedProfessionalUser.Email,
+		"DateOfBirth":    existedProfessionalUser.DateOfBirth,
+		"Cpf":            existedProfessionalUser.Cpf,
+		"ImageID":        existedProfessionalUser.ImageID,
+		"ClassHourPrice": existedProfessionalUser.ClassHourPrice,
+	}
+
+	//set expectations
+
+	mockStore.EXPECT().
+		GetProfessionalUser(gomock.Any(), gomock.Eq(existedProfessionalUser.ID)).AnyTimes().
+		Return(existedProfessionalUser, nil)
+
+	mockStore.EXPECT().
+		UpdateProfessionalUser(gomock.Any(), gomock.Any()).AnyTimes().
+		DoAndReturn(func(ctx context.Context, arg db.UpdateProfessionalUserParams) (db.ProfessionalUser, error) {
+			return existedProfessionalUser, nil
+		})
+
+	//start test server and send request
+	server := NewServer(mockStore)
+	recorder := httptest.NewRecorder()
+	url1 := fmt.Sprintf("/professionalUser/1")
+	request1, err := http.NewRequest(http.MethodGet, url1, nil)
+
+	require.NoError(t, err)
+	server.router.ServeHTTP(recorder, request1)
+	require.Equal(t, http.StatusOK, recorder.Code)
+
+	url := fmt.Sprintf("/professionalUser/1")
+	body := getBodyReader(req)
+	request2, err := http.NewRequest(http.MethodPut, url, &body)
+
+	require.NoError(t, err)
+	server.router.ServeHTTP(recorder, request2)
+	require.Equal(t, http.StatusOK, recorder.Code)
+}
+
 func randomProfessionalUser() db.ProfessionalUser {
 	return db.ProfessionalUser{
 		ID: 1,
