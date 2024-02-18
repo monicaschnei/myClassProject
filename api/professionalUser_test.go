@@ -82,7 +82,7 @@ func TestCreateProfessionalUserAPIBadRequest(t *testing.T) {
 		"Email":    "monica@gmail.com",
 		"DateOfBirth": time.Date(
 			2009, 11, 17, 20, 34, 58, 651387237, time.UTC),
-		"Cpf":            8686757565,
+		"Cpf":            8686757565, //  "error": "json: cannot unmarshal number 8686757565 into Go struct field createProfessionalUserRequest.cpf of type int32"
 		"ImageID":        2,
 		"ClassHourPrice": "20",
 	}
@@ -106,6 +106,46 @@ func TestCreateProfessionalUserAPIBadRequest(t *testing.T) {
 	server.router.ServeHTTP(recorder, request)
 
 	require.Equal(t, http.StatusBadRequest, recorder.Code)
+}
+
+func TestCreateProfessionalUserAPIInternalServerError(t *testing.T) {
+	existedProfessionalUser := randomProfessionalUser()
+	//create a new controller
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	//create a mock object for the Store interface
+	mockStore := mockdb.NewMockStore(ctrl)
+
+	req := gin.H{
+		"Name":           existedProfessionalUser.Name,
+		"Password":       existedProfessionalUser.Password,
+		"Gender":         existedProfessionalUser.Gender,
+		"Email":          existedProfessionalUser.Email,
+		"DateOfBirth":    existedProfessionalUser.DateOfBirth,
+		"Cpf":            existedProfessionalUser.Cpf,
+		"ImageID":        existedProfessionalUser.ImageID,
+		"ClassHourPrice": existedProfessionalUser.ClassHourPrice,
+	}
+
+	//set expectations
+	mockStore.EXPECT().
+		CreateProfessionalUser(gomock.Any(), gomock.Any()).AnyTimes().
+		DoAndReturn(func(ctx context.Context, arg db.CreateProfessionalUserParams) (db.ProfessionalUser, error) {
+			return db.ProfessionalUser{}, errors.New("Internal Server Error")
+		})
+
+	//start test server and send request
+	server := NewServer(mockStore)
+	recorder := httptest.NewRecorder()
+
+	url := fmt.Sprintf("/professionalUser")
+	body := getBodyReader(req)
+	request1, err := http.NewRequest(http.MethodPost, url, &body)
+
+	require.NoError(t, err)
+	server.router.ServeHTTP(recorder, request1)
+	require.Equal(t, http.StatusInternalServerError, recorder.Code)
 }
 
 func TestGetProfessionalUserAPI(t *testing.T) {
