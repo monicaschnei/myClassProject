@@ -5,7 +5,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -63,6 +65,47 @@ func TestCreateProfessionalUserAPI(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, recorder.Code)
 	requireBodyProfessionalUser(t, recorder.Body, professionalUser)
+}
+
+func TestCreateProfessionalUserAPIBadRequest(t *testing.T) {
+	//create a new controller
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	//create a mock object for the Store interface
+	mockStore := mockdb.NewMockStore(ctrl)
+
+	req := gin.H{
+		"Name":     "Monica",
+		"Password": "passwordMonica",
+		"Gender":   "female",
+		"Email":    "monica@gmail.com",
+		"DateOfBirth": time.Date(
+			2009, 11, 17, 20, 34, 58, 651387237, time.UTC),
+		"Cpf":            8686757565,
+		"ImageID":        2,
+		"ClassHourPrice": "20",
+	}
+
+	//set expectations
+	mockStore.EXPECT().
+		CreateProfessionalUser(gomock.Any(), gomock.Any()).AnyTimes().
+		DoAndReturn(func(ctx context.Context, arg db.CreateProfessionalUserParams) (db.ProfessionalUser, error) {
+			return db.ProfessionalUser{}, errors.New("Bad Request")
+		})
+
+	//start test server and send request
+	server := NewServer(mockStore)
+	recorder := httptest.NewRecorder()
+
+	url := fmt.Sprintf("/professionalUser")
+	body := getBodyReader(req)
+	request, err := http.NewRequest(http.MethodPost, url, &body)
+
+	require.NoError(t, err)
+	server.router.ServeHTTP(recorder, request)
+
+	require.Equal(t, http.StatusBadRequest, recorder.Code)
 }
 
 func TestGetProfessionalUserAPI(t *testing.T) {
