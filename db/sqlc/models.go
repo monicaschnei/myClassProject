@@ -35,18 +35,19 @@ type ProfessionalInformation struct {
 }
 
 type ProfessionalUser struct {
-	ID             int64     `json:"id"`
-	CreatedAt      time.Time `json:"created_at"`
-	Name           string    `json:"name"`
-	Username       string    `json:"username"`
-	Password       string    `json:"password"`
-	Gender         string    `json:"gender"`
-	Email          string    `json:"email"`
-	DateOfBirth    time.Time `json:"date_of_birth"`
-	Cpf            int32     `json:"cpf"`
-	ImageID        int64     `json:"image_id"`
-	UpdatedAt      time.Time `json:"updated_at"`
-	ClassHourPrice string    `json:"class_hour_price"`
+	ID                int64     `json:"id"`
+	CreatedAt         time.Time `json:"created_at"`
+	Name              string    `json:"name"`
+	Username          string    `json:"username"`
+	Gender            string    `json:"gender"`
+	Email             string    `json:"email"`
+	DateOfBirth       time.Time `json:"date_of_birth"`
+	Cpf               string    `json:"cpf"`
+	ImageID           int64     `json:"image_id"`
+	PasswordChangedAt time.Time `json:"password_changed_at"`
+	HashedPassword    string    `json:"hashed_password"`
+	UpdatedAt         time.Time `json:"updated_at"`
+	ClassHourPrice    string    `json:"class_hour_price"`
 }
 
 type ProfessionalUserSubjectMatter struct {
@@ -55,26 +56,30 @@ type ProfessionalUserSubjectMatter struct {
 }
 
 type ResponsibleStudent struct {
-	ID          int64     `json:"id"`
-	Name        string    `json:"name"`
-	Gender      string    `json:"gender"`
-	Email       string    `json:"email"`
-	DateOfBirth time.Time `json:"date_of_birth"`
-	Cpf         int32     `json:"cpf"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID                int64     `json:"id"`
+	Username          string    `json:"username"`
+	Name              string    `json:"name"`
+	Gender            string    `json:"gender"`
+	Email             string    `json:"email"`
+	DateOfBirth       time.Time `json:"date_of_birth"`
+	Cpf               string    `json:"cpf"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
+	PasswordChangedAt time.Time `json:"password_changed_at"`
+	HashedPassword    string    `json:"hashed_password"`
 }
 
 type StudentUser struct {
 	ID                   int64     `json:"id"`
 	Username             string    `json:"username"`
-	Password             string    `json:"password"`
 	Name                 string    `json:"name"`
 	DateOfBirth          time.Time `json:"date_of_birth"`
 	Gender               string    `json:"gender"`
 	CreatedAt            time.Time `json:"created_at"`
 	ResponsibleStudentID int64     `json:"responsible_student_id"`
 	UpdatedAt            time.Time `json:"updated_at"`
+	PasswordChangedAt    time.Time `json:"password_changed_at"`
+	HashedPassword       string    `json:"hashed_password"`
 }
 
 type SubjectMatter struct {

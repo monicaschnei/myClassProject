@@ -1,42 +1,82 @@
 package api
 
 import (
+	"fmt"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	db "myclass/db/sqlc"
+	"myclass/token"
+	"myclass/util"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	store  db.Store
-	router *gin.Engine
+	config     util.Config
+	store      db.Store
+	tokenMaker token.Maker
+	router     *gin.Engine
 }
 
-func NewServer(store db.Store) *Server {
-	server := &Server{store: store}
+// NewServer creates a new HTTP server and setup routing
+func NewServer(config util.Config, store db.Store) (*Server, error) {
+	tokenMaker, err := token.NewPasetoMaker(config.AccesSymetryTokenKey)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot create token maker: %w", err)
+	}
+
+	server := &Server{
+		config:     config,
+		store:      store,
+		tokenMaker: tokenMaker,
+	}
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("gender", ValidGender)
+	}
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("passwd", ValidPassword)
+	}
+
+	server.setUpRouter()
+	return server, nil
+}
+
+func (server *Server) setUpRouter() {
 	router := gin.Default()
+
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+
 	//professionalUsers
 	router.POST("/professionalUser", server.createProfessionalUser)
-	router.PUT("/professionalUser/:id", server.updateProfessionalUser)
-	router.GET("/professionalUser/:id", server.getProfessionalUserById)
+	router.POST("/professionalUser/login", server.loginProfessionalUser)
+	authRoutes.PUT("/professionalUser/:username", server.updateProfessionalUser) //precisa estar loggado
+	router.GET("/professionalUser/:username", server.getProfessionalUserById)
 	router.GET("/professionalUsers", server.listAllProfessionalUsers)
-	router.DELETE("/professionalUser/:id", server.deleteProfessionalUser)
+	authRoutes.DELETE("/professionalUser/:username", server.deleteProfessionalUser) //precisa estar loggado
+
 	//professionalInformations
-	router.POST("/professionalInformation/:id", server.createProfessionalInformation)
+	router.POST("/professionalInformation/:username", server.createProfessionalInformation)
 	router.GET("/professionalInformation/:id", server.getProfessionalInformation)
 	router.GET("/listProfessionalInformations/:id", server.listAllProfessionalInformationsByUser)
-	router.PUT("/professionalInformations/:id", server.updateProfessionalInformation)
+	authRoutes.PUT("/professionalInformations/:username", server.updateProfessionalInformation) //precisa estar loggado
+
 	//studentUser
-	router.POST("/studentUser/:id", server.createStudentUser)
-	router.GET("/studentUser/:id", server.getStudentUserById)
+	router.POST("/studentUser/:username", server.createStudentUser)
+	router.POST("/studentUser/login", server.loginStudentUser)
+	router.GET("/studentUser/:username", server.getStudentUserById)
 	router.GET("/listStudentUsers", server.listAllStudentUsers)
-	router.PUT("/studentUser/:id", server.updateStudentlUser)
+	authRoutes.PUT("/studentUser/:username/:responsibleStudent", server.updateStudentlUser) //precisa estar loggado
+
 	//responsibleStudent
 	router.POST("/responsibleStudent", server.createResponsibleStudent)
-	router.GET("/responsibleStudent/:id", server.getResponsibleStudentUserById)
+	router.POST("/responsibleStudent/login", server.loginResponsibleStudent)
+	router.GET("/responsibleStudent/:username", server.getResponsibleStudentUserById)
 	router.GET("/listResponsibleStudent", server.listAllResponsibleStudents)
-	router.PUT("/responsibleStudent/:id", server.updateResponsibleStudentl)
+	authRoutes.PUT("/responsibleStudent/:username", server.updateResponsibleStudent) //precisa estar loggado
+
 	server.router = router
-	return server
 }
 
 func (server *Server) Start(address string) error {

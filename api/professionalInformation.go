@@ -1,8 +1,10 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	db "myclass/db/sqlc"
+	"myclass/token"
 	"net/http"
 	"time"
 
@@ -23,7 +25,7 @@ type createProfessionalInformationRequest struct {
 }
 
 type professionalUserId struct {
-	ID int64 `uri:"id" binding:"required,min=1"`
+	UserName string `uri:"username" binding:"required"`
 }
 
 func (server *Server) createProfessionalInformation(ctx *gin.Context) {
@@ -34,7 +36,7 @@ func (server *Server) createProfessionalInformation(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	professionalUser, err := server.store.GetProfessionalUser(ctx, reqUser.ID)
+	professionalUser, err := server.store.GetProfessionalUser(ctx, reqUser.UserName)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusNotFound, "This user does not exists, please create it firstly")
@@ -100,7 +102,7 @@ func (server *Server) listAllProfessionalInformationsByUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	professionalUser, err := server.store.GetProfessionalUser(ctx, reqUser.ID)
+	professionalUser, err := server.store.GetProfessionalUser(ctx, reqUser.UserName)
 
 	if err != nil {
 		fmt.Println(err)
@@ -143,7 +145,7 @@ func (server *Server) updateProfessionalInformation(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	professionalUser, err := server.store.GetProfessionalUser(ctx, reqUser.ID)
+	professionalUser, err := server.store.GetProfessionalUser(ctx, reqUser.UserName)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusNotFound, "This user does not exists, please create it firstly")
@@ -166,5 +168,13 @@ func (server *Server) updateProfessionalInformation(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, "Could not update this user")
 		return
 	}
+
+	authPayload := ctx.MustGet(authorizatiionPayloadKey).(*token.Payload)
+	if professionalUser.Username != authPayload.Username {
+		err := errors.New("Account does not belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
 	ctx.JSON(http.StatusOK, professionalUserUpdated)
 }

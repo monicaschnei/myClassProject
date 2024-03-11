@@ -2,13 +2,14 @@ CREATE TABLE "professionalUser" (
   "id" bigserial PRIMARY KEY NOT NULL,
   "created_at" timestamp DEFAULT (now()) NOT NULL,
   "name" varchar NOT NULL,
-  "username" varchar NOT NULL,
-  "password" varchar UNIQUE NOT NULL,
+  "username" varchar UNIQUE NOT NULL,
   "gender" varchar NOT NULL,
   "email" varchar UNIQUE NOT NULL,
   "date_of_birth" Date NOT NULL,
-  "cpf" integer UNIQUE NOT NULL,
+  "cpf" varchar UNIQUE NOT NULL,
   "image_id" bigint UNIQUE NOT NULL,
+  "password_changed_at" timestamp NOT NULL DEFAULT (now()),
+  "hashed_password" varchar NOT NULL,
   "updated_at" timestamp DEFAULT (now()) NOT NULL,
   "class_hour_price" varchar NOT NULL
 );
@@ -40,29 +41,33 @@ CREATE TABLE "subjectMatterClass" (
 
 CREATE TABLE "studentUser" (
   "id" bigserial PRIMARY KEY NOT NULL,
-  "username" varchar NOT NULL,
-  "password" varchar UNIQUE NOT NULL,
+  "username" varchar UNIQUE NOT NULL,
   "name" varchar NOT NULL,
   "date_of_birth" Date NOT NULL,
   "gender" varchar NOT NULL,
-  "created_at" timestamp 
+  "created_at" timestamp
    DEFAULT (now()) NOT NULL,
   "responsible_student_id" bigserial NOT NULL,
-  "updated_at" timestamp 
-   DEFAULT (now()) NOT NULL
+  "updated_at" timestamp
+   DEFAULT (now()) NOT NULL,
+  "password_changed_at" timestamp NOT NULL DEFAULT (now()),
+  "hashed_password" varchar NOT NULL
 );
 
 CREATE TABLE "responsibleStudent" (
   "id" bigserial PRIMARY KEY NOT NULL,
+  "username" varchar UNIQUE NOT NULL,
   "name" varchar NOT NULL,
   "gender" varchar NOT NULL,
   "email" varchar NOT NULL,
   "date_of_birth" Date NOT NULL,
-  "cpf" integer UNIQUE NOT NULL,
+  "cpf" varchar UNIQUE NOT NULL,
   "created_at" timestamp
    DEFAULT (now()) NOT NULL,
   "updated_at" timestamp 
-   DEFAULT (now()) NOT NULL
+   DEFAULT (now()) NOT NULL,
+  "password_changed_at" timestamp NOT NULL DEFAULT (now()),
+  "hashed_password" varchar NOT NULL
 );
 
 CREATE TABLE "professionalInformation" (

@@ -4,16 +4,18 @@ name,
 gender,
 email,
 date_of_birth,
+username,
 cpf,
+hashed_password,
 updated_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6
+    $1, $2, $3, $4, $5, $6, $7, $8
 )
 RETURNING *;
 
 -- name: GetResponsibleStudent :one
 SELECT * FROM "responsibleStudent" 
-WHERE id = $1 LIMIT 1;
+WHERE username = $1 LIMIT 1;
 
 -- name: ListResponsibleStudent :many
 SELECT * FROM "responsibleStudent" 

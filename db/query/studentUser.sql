@@ -1,7 +1,7 @@
 -- name: CreateStudentUser :one
 INSERT INTO "studentUser" (
     username,
-    password,
+    hashed_password,
     name,
     date_of_birth,
     gender,
@@ -13,7 +13,7 @@ RETURNING *;
 
 -- name: GetStudentUser :one
 SELECT * FROM "studentUser" 
-WHERE id = $1 LIMIT 1;
+WHERE username = $1 LIMIT 1;
 
 -- name: ListStudentUser :many
 SELECT * FROM "studentUser" 
@@ -25,7 +25,7 @@ OFFSET $2;
 -- name: UpdateStudentUser :one
 UPDATE "studentUser"
     set username = $2,
-    password = $3,
+    hashed_password = $3,
     name = $4,
     responsible_student_id = $5
 WHERE id = $1

@@ -16,21 +16,25 @@ name,
 gender,
 email,
 date_of_birth,
+username,
 cpf,
+hashed_password,
 updated_at
 ) VALUES (
-    $1, $2, $3, $4, $5, $6
+    $1, $2, $3, $4, $5, $6, $7, $8
 )
-RETURNING id, name, gender, email, date_of_birth, cpf, created_at, updated_at
+RETURNING id, username, name, gender, email, date_of_birth, cpf, created_at, updated_at, password_changed_at, hashed_password
 `
 
 type CreateResponsibleStudentParams struct {
-	Name        string    `json:"name"`
-	Gender      string    `json:"gender"`
-	Email       string    `json:"email"`
-	DateOfBirth time.Time `json:"date_of_birth"`
-	Cpf         int32     `json:"cpf"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	Name           string    `json:"name"`
+	Gender         string    `json:"gender"`
+	Email          string    `json:"email"`
+	DateOfBirth    time.Time `json:"date_of_birth"`
+	Username       string    `json:"username"`
+	Cpf            string    `json:"cpf"`
+	HashedPassword string    `json:"hashed_password"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 func (q *Queries) CreateResponsibleStudent(ctx context.Context, arg CreateResponsibleStudentParams) (ResponsibleStudent, error) {
@@ -39,12 +43,15 @@ func (q *Queries) CreateResponsibleStudent(ctx context.Context, arg CreateRespon
 		arg.Gender,
 		arg.Email,
 		arg.DateOfBirth,
+		arg.Username,
 		arg.Cpf,
+		arg.HashedPassword,
 		arg.UpdatedAt,
 	)
 	var i ResponsibleStudent
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.Name,
 		&i.Gender,
 		&i.Email,
@@ -52,6 +59,8 @@ func (q *Queries) CreateResponsibleStudent(ctx context.Context, arg CreateRespon
 		&i.Cpf,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 	)
 	return i, err
 }
@@ -59,7 +68,7 @@ func (q *Queries) CreateResponsibleStudent(ctx context.Context, arg CreateRespon
 const deleteResponsibleStudent = `-- name: DeleteResponsibleStudent :one
 DELETE FROM "responsibleStudent"
 WHERE id = $1
-RETURNING id, name, gender, email, date_of_birth, cpf, created_at, updated_at
+RETURNING id, username, name, gender, email, date_of_birth, cpf, created_at, updated_at, password_changed_at, hashed_password
 `
 
 func (q *Queries) DeleteResponsibleStudent(ctx context.Context, id int64) (ResponsibleStudent, error) {
@@ -67,6 +76,7 @@ func (q *Queries) DeleteResponsibleStudent(ctx context.Context, id int64) (Respo
 	var i ResponsibleStudent
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.Name,
 		&i.Gender,
 		&i.Email,
@@ -74,20 +84,23 @@ func (q *Queries) DeleteResponsibleStudent(ctx context.Context, id int64) (Respo
 		&i.Cpf,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 	)
 	return i, err
 }
 
 const getResponsibleStudent = `-- name: GetResponsibleStudent :one
-SELECT id, name, gender, email, date_of_birth, cpf, created_at, updated_at FROM "responsibleStudent" 
-WHERE id = $1 LIMIT 1
+SELECT id, username, name, gender, email, date_of_birth, cpf, created_at, updated_at, password_changed_at, hashed_password FROM "responsibleStudent" 
+WHERE username = $1 LIMIT 1
 `
 
-func (q *Queries) GetResponsibleStudent(ctx context.Context, id int64) (ResponsibleStudent, error) {
-	row := q.queryRow(ctx, q.getResponsibleStudentStmt, getResponsibleStudent, id)
+func (q *Queries) GetResponsibleStudent(ctx context.Context, username string) (ResponsibleStudent, error) {
+	row := q.queryRow(ctx, q.getResponsibleStudentStmt, getResponsibleStudent, username)
 	var i ResponsibleStudent
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.Name,
 		&i.Gender,
 		&i.Email,
@@ -95,12 +108,14 @@ func (q *Queries) GetResponsibleStudent(ctx context.Context, id int64) (Responsi
 		&i.Cpf,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 	)
 	return i, err
 }
 
 const listResponsibleStudent = `-- name: ListResponsibleStudent :many
-SELECT id, name, gender, email, date_of_birth, cpf, created_at, updated_at FROM "responsibleStudent" 
+SELECT id, username, name, gender, email, date_of_birth, cpf, created_at, updated_at, password_changed_at, hashed_password FROM "responsibleStudent" 
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -122,6 +137,7 @@ func (q *Queries) ListResponsibleStudent(ctx context.Context, arg ListResponsibl
 		var i ResponsibleStudent
 		if err := rows.Scan(
 			&i.ID,
+			&i.Username,
 			&i.Name,
 			&i.Gender,
 			&i.Email,
@@ -129,6 +145,8 @@ func (q *Queries) ListResponsibleStudent(ctx context.Context, arg ListResponsibl
 			&i.Cpf,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.PasswordChangedAt,
+			&i.HashedPassword,
 		); err != nil {
 			return nil, err
 		}
@@ -148,7 +166,7 @@ UPDATE "responsibleStudent"
     set name = $2,
     email = $3
 WHERE id = $1
-RETURNING id, name, gender, email, date_of_birth, cpf, created_at, updated_at
+RETURNING id, username, name, gender, email, date_of_birth, cpf, created_at, updated_at, password_changed_at, hashed_password
 `
 
 type UpdateResponsibleStudentParams struct {
@@ -162,6 +180,7 @@ func (q *Queries) UpdateResponsibleStudent(ctx context.Context, arg UpdateRespon
 	var i ResponsibleStudent
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.Name,
 		&i.Gender,
 		&i.Email,
@@ -169,6 +188,8 @@ func (q *Queries) UpdateResponsibleStudent(ctx context.Context, arg UpdateRespon
 		&i.Cpf,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 	)
 	return i, err
 }

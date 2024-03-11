@@ -2,7 +2,7 @@
 INSERT INTO "professionalUser" (
     name,
     username,
-    password,
+    hashed_password,
     gender,
     email, 
     date_of_birth,
@@ -17,7 +17,7 @@ RETURNING *;
 
 -- name: GetProfessionalUser :one
 SELECT * FROM "professionalUser" 
-WHERE id = $1 LIMIT 1;
+WHERE username = $1 LIMIT 1;
 
 -- name: ListProfessionalUser :many
 SELECT * FROM "professionalUser" 
@@ -30,7 +30,7 @@ OFFSET $2;
 UPDATE "professionalUser"
     set  name = $2,
     username = $3,
-    password = $4,
+    hashed_password = $4,
     email = $5, 
     date_of_birth = $6,
     class_hour_price = $7

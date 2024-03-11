@@ -13,7 +13,7 @@ import (
 const createStudentUser = `-- name: CreateStudentUser :one
 INSERT INTO "studentUser" (
     username,
-    password,
+    hashed_password,
     name,
     date_of_birth,
     gender,
@@ -21,12 +21,12 @@ INSERT INTO "studentUser" (
 ) VALUES (
     $1, $2, $3, $4, $5, $6
 )
-RETURNING id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at
+RETURNING id, username, name, date_of_birth, gender, created_at, responsible_student_id, updated_at, password_changed_at, hashed_password
 `
 
 type CreateStudentUserParams struct {
 	Username             string    `json:"username"`
-	Password             string    `json:"password"`
+	HashedPassword       string    `json:"hashed_password"`
 	Name                 string    `json:"name"`
 	DateOfBirth          time.Time `json:"date_of_birth"`
 	Gender               string    `json:"gender"`
@@ -36,7 +36,7 @@ type CreateStudentUserParams struct {
 func (q *Queries) CreateStudentUser(ctx context.Context, arg CreateStudentUserParams) (StudentUser, error) {
 	row := q.queryRow(ctx, q.createStudentUserStmt, createStudentUser,
 		arg.Username,
-		arg.Password,
+		arg.HashedPassword,
 		arg.Name,
 		arg.DateOfBirth,
 		arg.Gender,
@@ -46,13 +46,14 @@ func (q *Queries) CreateStudentUser(ctx context.Context, arg CreateStudentUserPa
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Password,
 		&i.Name,
 		&i.DateOfBirth,
 		&i.Gender,
 		&i.CreatedAt,
 		&i.ResponsibleStudentID,
 		&i.UpdatedAt,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 	)
 	return i, err
 }
@@ -60,7 +61,7 @@ func (q *Queries) CreateStudentUser(ctx context.Context, arg CreateStudentUserPa
 const deleteStudentUser = `-- name: DeleteStudentUser :one
 DELETE FROM "studentUser"
 WHERE id = $1
-RETURNING id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at
+RETURNING id, username, name, date_of_birth, gender, created_at, responsible_student_id, updated_at, password_changed_at, hashed_password
 `
 
 func (q *Queries) DeleteStudentUser(ctx context.Context, id int64) (StudentUser, error) {
@@ -69,41 +70,43 @@ func (q *Queries) DeleteStudentUser(ctx context.Context, id int64) (StudentUser,
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Password,
 		&i.Name,
 		&i.DateOfBirth,
 		&i.Gender,
 		&i.CreatedAt,
 		&i.ResponsibleStudentID,
 		&i.UpdatedAt,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 	)
 	return i, err
 }
 
 const getStudentUser = `-- name: GetStudentUser :one
-SELECT id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at FROM "studentUser" 
-WHERE id = $1 LIMIT 1
+SELECT id, username, name, date_of_birth, gender, created_at, responsible_student_id, updated_at, password_changed_at, hashed_password FROM "studentUser" 
+WHERE username = $1 LIMIT 1
 `
 
-func (q *Queries) GetStudentUser(ctx context.Context, id int64) (StudentUser, error) {
-	row := q.queryRow(ctx, q.getStudentUserStmt, getStudentUser, id)
+func (q *Queries) GetStudentUser(ctx context.Context, username string) (StudentUser, error) {
+	row := q.queryRow(ctx, q.getStudentUserStmt, getStudentUser, username)
 	var i StudentUser
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Password,
 		&i.Name,
 		&i.DateOfBirth,
 		&i.Gender,
 		&i.CreatedAt,
 		&i.ResponsibleStudentID,
 		&i.UpdatedAt,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 	)
 	return i, err
 }
 
 const listStudentUser = `-- name: ListStudentUser :many
-SELECT id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at FROM "studentUser" 
+SELECT id, username, name, date_of_birth, gender, created_at, responsible_student_id, updated_at, password_changed_at, hashed_password FROM "studentUser" 
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -126,13 +129,14 @@ func (q *Queries) ListStudentUser(ctx context.Context, arg ListStudentUserParams
 		if err := rows.Scan(
 			&i.ID,
 			&i.Username,
-			&i.Password,
 			&i.Name,
 			&i.DateOfBirth,
 			&i.Gender,
 			&i.CreatedAt,
 			&i.ResponsibleStudentID,
 			&i.UpdatedAt,
+			&i.PasswordChangedAt,
+			&i.HashedPassword,
 		); err != nil {
 			return nil, err
 		}
@@ -150,17 +154,17 @@ func (q *Queries) ListStudentUser(ctx context.Context, arg ListStudentUserParams
 const updateStudentUser = `-- name: UpdateStudentUser :one
 UPDATE "studentUser"
     set username = $2,
-    password = $3,
+    hashed_password = $3,
     name = $4,
     responsible_student_id = $5
 WHERE id = $1
-RETURNING id, username, password, name, date_of_birth, gender, created_at, responsible_student_id, updated_at
+RETURNING id, username, name, date_of_birth, gender, created_at, responsible_student_id, updated_at, password_changed_at, hashed_password
 `
 
 type UpdateStudentUserParams struct {
 	ID                   int64  `json:"id"`
 	Username             string `json:"username"`
-	Password             string `json:"password"`
+	HashedPassword       string `json:"hashed_password"`
 	Name                 string `json:"name"`
 	ResponsibleStudentID int64  `json:"responsible_student_id"`
 }
@@ -169,7 +173,7 @@ func (q *Queries) UpdateStudentUser(ctx context.Context, arg UpdateStudentUserPa
 	row := q.queryRow(ctx, q.updateStudentUserStmt, updateStudentUser,
 		arg.ID,
 		arg.Username,
-		arg.Password,
+		arg.HashedPassword,
 		arg.Name,
 		arg.ResponsibleStudentID,
 	)
@@ -177,13 +181,14 @@ func (q *Queries) UpdateStudentUser(ctx context.Context, arg UpdateStudentUserPa
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Password,
 		&i.Name,
 		&i.DateOfBirth,
 		&i.Gender,
 		&i.CreatedAt,
 		&i.ResponsibleStudentID,
 		&i.UpdatedAt,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 	)
 	return i, err
 }

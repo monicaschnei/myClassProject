@@ -14,7 +14,7 @@ const createProfessionalUser = `-- name: CreateProfessionalUser :one
 INSERT INTO "professionalUser" (
     name,
     username,
-    password,
+    hashed_password,
     gender,
     email, 
     date_of_birth,
@@ -25,17 +25,17 @@ INSERT INTO "professionalUser" (
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 )
-RETURNING id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, updated_at, class_hour_price
+RETURNING id, created_at, name, username, gender, email, date_of_birth, cpf, image_id, password_changed_at, hashed_password, updated_at, class_hour_price
 `
 
 type CreateProfessionalUserParams struct {
 	Name           string    `json:"name"`
 	Username       string    `json:"username"`
-	Password       string    `json:"password"`
+	HashedPassword string    `json:"hashed_password"`
 	Gender         string    `json:"gender"`
 	Email          string    `json:"email"`
 	DateOfBirth    time.Time `json:"date_of_birth"`
-	Cpf            int32     `json:"cpf"`
+	Cpf            string    `json:"cpf"`
 	ImageID        int64     `json:"image_id"`
 	UpdatedAt      time.Time `json:"updated_at"`
 	ClassHourPrice string    `json:"class_hour_price"`
@@ -45,7 +45,7 @@ func (q *Queries) CreateProfessionalUser(ctx context.Context, arg CreateProfessi
 	row := q.queryRow(ctx, q.createProfessionalUserStmt, createProfessionalUser,
 		arg.Name,
 		arg.Username,
-		arg.Password,
+		arg.HashedPassword,
 		arg.Gender,
 		arg.Email,
 		arg.DateOfBirth,
@@ -60,12 +60,13 @@ func (q *Queries) CreateProfessionalUser(ctx context.Context, arg CreateProfessi
 		&i.CreatedAt,
 		&i.Name,
 		&i.Username,
-		&i.Password,
 		&i.Gender,
 		&i.Email,
 		&i.DateOfBirth,
 		&i.Cpf,
 		&i.ImageID,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 		&i.UpdatedAt,
 		&i.ClassHourPrice,
 	)
@@ -75,7 +76,7 @@ func (q *Queries) CreateProfessionalUser(ctx context.Context, arg CreateProfessi
 const deleteProfessionalUser = `-- name: DeleteProfessionalUser :one
 DELETE FROM "professionalUser"
 WHERE id = $1
-RETURNING id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, updated_at, class_hour_price
+RETURNING id, created_at, name, username, gender, email, date_of_birth, cpf, image_id, password_changed_at, hashed_password, updated_at, class_hour_price
 `
 
 func (q *Queries) DeleteProfessionalUser(ctx context.Context, id int64) (ProfessionalUser, error) {
@@ -86,12 +87,13 @@ func (q *Queries) DeleteProfessionalUser(ctx context.Context, id int64) (Profess
 		&i.CreatedAt,
 		&i.Name,
 		&i.Username,
-		&i.Password,
 		&i.Gender,
 		&i.Email,
 		&i.DateOfBirth,
 		&i.Cpf,
 		&i.ImageID,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 		&i.UpdatedAt,
 		&i.ClassHourPrice,
 	)
@@ -99,24 +101,25 @@ func (q *Queries) DeleteProfessionalUser(ctx context.Context, id int64) (Profess
 }
 
 const getProfessionalUser = `-- name: GetProfessionalUser :one
-SELECT id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, updated_at, class_hour_price FROM "professionalUser" 
-WHERE id = $1 LIMIT 1
+SELECT id, created_at, name, username, gender, email, date_of_birth, cpf, image_id, password_changed_at, hashed_password, updated_at, class_hour_price FROM "professionalUser" 
+WHERE username = $1 LIMIT 1
 `
 
-func (q *Queries) GetProfessionalUser(ctx context.Context, id int64) (ProfessionalUser, error) {
-	row := q.queryRow(ctx, q.getProfessionalUserStmt, getProfessionalUser, id)
+func (q *Queries) GetProfessionalUser(ctx context.Context, username string) (ProfessionalUser, error) {
+	row := q.queryRow(ctx, q.getProfessionalUserStmt, getProfessionalUser, username)
 	var i ProfessionalUser
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.Name,
 		&i.Username,
-		&i.Password,
 		&i.Gender,
 		&i.Email,
 		&i.DateOfBirth,
 		&i.Cpf,
 		&i.ImageID,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 		&i.UpdatedAt,
 		&i.ClassHourPrice,
 	)
@@ -124,7 +127,7 @@ func (q *Queries) GetProfessionalUser(ctx context.Context, id int64) (Profession
 }
 
 const listProfessionalUser = `-- name: ListProfessionalUser :many
-SELECT id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, updated_at, class_hour_price FROM "professionalUser" 
+SELECT id, created_at, name, username, gender, email, date_of_birth, cpf, image_id, password_changed_at, hashed_password, updated_at, class_hour_price FROM "professionalUser" 
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -149,12 +152,13 @@ func (q *Queries) ListProfessionalUser(ctx context.Context, arg ListProfessional
 			&i.CreatedAt,
 			&i.Name,
 			&i.Username,
-			&i.Password,
 			&i.Gender,
 			&i.Email,
 			&i.DateOfBirth,
 			&i.Cpf,
 			&i.ImageID,
+			&i.PasswordChangedAt,
+			&i.HashedPassword,
 			&i.UpdatedAt,
 			&i.ClassHourPrice,
 		); err != nil {
@@ -175,19 +179,19 @@ const updateProfessionalUser = `-- name: UpdateProfessionalUser :one
 UPDATE "professionalUser"
     set  name = $2,
     username = $3,
-    password = $4,
+    hashed_password = $4,
     email = $5, 
     date_of_birth = $6,
     class_hour_price = $7
 WHERE id = $1
-RETURNING id, created_at, name, username, password, gender, email, date_of_birth, cpf, image_id, updated_at, class_hour_price
+RETURNING id, created_at, name, username, gender, email, date_of_birth, cpf, image_id, password_changed_at, hashed_password, updated_at, class_hour_price
 `
 
 type UpdateProfessionalUserParams struct {
 	ID             int64     `json:"id"`
 	Name           string    `json:"name"`
 	Username       string    `json:"username"`
-	Password       string    `json:"password"`
+	HashedPassword string    `json:"hashed_password"`
 	Email          string    `json:"email"`
 	DateOfBirth    time.Time `json:"date_of_birth"`
 	ClassHourPrice string    `json:"class_hour_price"`
@@ -198,7 +202,7 @@ func (q *Queries) UpdateProfessionalUser(ctx context.Context, arg UpdateProfessi
 		arg.ID,
 		arg.Name,
 		arg.Username,
-		arg.Password,
+		arg.HashedPassword,
 		arg.Email,
 		arg.DateOfBirth,
 		arg.ClassHourPrice,
@@ -209,12 +213,13 @@ func (q *Queries) UpdateProfessionalUser(ctx context.Context, arg UpdateProfessi
 		&i.CreatedAt,
 		&i.Name,
 		&i.Username,
-		&i.Password,
 		&i.Gender,
 		&i.Email,
 		&i.DateOfBirth,
 		&i.Cpf,
 		&i.ImageID,
+		&i.PasswordChangedAt,
+		&i.HashedPassword,
 		&i.UpdatedAt,
 		&i.ClassHourPrice,
 	)
