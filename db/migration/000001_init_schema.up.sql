@@ -98,6 +98,15 @@ CREATE TABLE "phone" (
   "user_id" bigint UNIQUE NOT NULL
 );
 
+CREATE TABLE "availability" (
+    "id" bigserial PRIMARY KEY NOT NULL,
+    "start" varchar NOT NULL,
+    "end" varchar NOT NULL,
+    "is_available" varchar NOT NULL,
+    "user_id" bigint UNIQUE NOT NULL,
+    "username" varchar UNIQUE NOT NULL
+);
+
 ALTER TABLE "professionalInformation" ADD FOREIGN KEY ("professional_user_id") REFERENCES "professionalUser" ("id");
 
 ALTER TABLE "subjectMatterClass" ADD FOREIGN KEY ("professional_user_id") REFERENCES "professionalUser" ("id");
