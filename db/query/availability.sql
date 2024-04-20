@@ -1,12 +1,13 @@
--- name: CreateAvailability :one
+-- name: AddAvailability :one
 INSERT INTO "availability" (
+  date,
   start,
-  end,
+  end_time,
   is_available,
   user_id,
   username
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, $4, $5, $6
 )
 RETURNING *;
 

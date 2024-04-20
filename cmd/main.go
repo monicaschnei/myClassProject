@@ -9,7 +9,7 @@ import (
 	"myclass/api"
 	db "myclass/db/sqlc"
 	"myclass/internal/controller"
-	"myclass/internal/core/service"
+	"myclass/internal/core/usecase"
 	"myclass/util"
 )
 
@@ -33,13 +33,16 @@ func main() {
 	store := db.NewStore(connection)
 
 	//Cria Service
-	professionalUserService := service.NewProfessionalUserService(store, api.NewServer(instance, config))
+	professionalUserService := usecase.NewProfessionalUserService(store, api.NewServer(instance, config))
+	professionalAvailabilityService := usecase.NewProfessionalAvailabilityService(store, api.NewServer(instance, config), professionalUserService)
 
 	//Cria Controller
 	professionalUserController := controller.NewProfessionalUserController(instance, professionalUserService)
+	availabilityProfessionalUserController := controller.NewAvailabilityProfessionalUserController(instance, professionalAvailabilityService)
 
 	//Inicializa as rotas do controller
 	professionalUserController.InitRouter()
+	availabilityProfessionalUserController.InitRouter()
 
 	//Cria o httpServer
 	server := api.NewServer(instance, config)

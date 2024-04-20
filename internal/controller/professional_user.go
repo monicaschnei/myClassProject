@@ -3,20 +3,20 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"myclass/api"
-	"myclass/internal/core/common/router"
-	"myclass/internal/core/model/request"
-	"myclass/internal/core/port/service"
+	"myclass/internal/core/domain/request"
+	"myclass/internal/core/port/usecase"
+	"myclass/internal/infrastructure/router"
 	"myclass/token"
 	"net/http"
 )
 
 type ProfessionalUserController struct {
 	gin         *gin.Engine
-	userService service.ProfessionalUserService
+	userService usecase.ProfessionalUserService
 	tokenMaker  token.Maker
 }
 
-func NewProfessionalUserController(gin *gin.Engine, userService service.ProfessionalUserService) ProfessionalUserController {
+func NewProfessionalUserController(gin *gin.Engine, userService usecase.ProfessionalUserService) ProfessionalUserController {
 	return ProfessionalUserController{
 		gin:         gin,
 		userService: userService,
@@ -30,6 +30,8 @@ func (u ProfessionalUserController) InitRouter() {
 	router.Post(api, "/professionalUser", u.createProfessionalUser)
 	router.Get(api, "/professionalUser/:username", u.getProfessionalUser)
 	router.Post(api, "/professionalUser/login", u.loginProfessionalUser)
+	router.Post(api, "/professionalUsers", u.listAllProfessionalUsers)
+	router.Put(authApi, "/professionalUser/:username", u.updateProfessionalUser)
 }
 
 func (u ProfessionalUserController) createProfessionalUser(ctx *gin.Context) {
@@ -77,4 +79,40 @@ func (u ProfessionalUserController) loginProfessionalUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, professionalUserLogged)
+}
+
+func (u ProfessionalUserController) listAllProfessionalUsers(ctx *gin.Context) {
+	var req *request.ListProfessionalUsersRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	professionalUsers, err := u.userService.ListProfessionalUser(ctx, req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, professionalUsers)
+}
+
+func (u ProfessionalUserController) updateProfessionalUser(ctx *gin.Context) {
+	var req request.UpdateProfessionalUserRequest
+	var reqUser request.GetProfissionalUserRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := ctx.ShouldBindUri(&reqUser); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var authPayload = ctx.MustGet("authorization_payload").(*token.Payload)
+	professionalUserUpdated, err := u.userService.UpdateProfessionalUser(ctx, authPayload, reqUser.UserName, &req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, professionalUserUpdated)
 }

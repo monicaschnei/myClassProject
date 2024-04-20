@@ -9,6 +9,7 @@ import (
 )
 
 type Querier interface {
+	AddAvailability(ctx context.Context, arg AddAvailabilityParams) (Availability, error)
 	CreatePhone(ctx context.Context, arg CreatePhoneParams) (Phone, error)
 	CreateProfessionalInformation(ctx context.Context, arg CreateProfessionalInformationParams) (ProfessionalInformation, error)
 	CreateProfessionalUser(ctx context.Context, arg CreateProfessionalUserParams) (ProfessionalUser, error)
@@ -16,6 +17,7 @@ type Querier interface {
 	CreateStudentUser(ctx context.Context, arg CreateStudentUserParams) (StudentUser, error)
 	CreateSubjectMatter(ctx context.Context, arg CreateSubjectMatterParams) (SubjectMatter, error)
 	CreateSubjectMatterClass(ctx context.Context, arg CreateSubjectMatterClassParams) (SubjectMatterClass, error)
+	DeleteAvailability(ctx context.Context, id int64) (Availability, error)
 	DeletePhone(ctx context.Context, id int64) (Phone, error)
 	DeleteProfessionalInformation(ctx context.Context, id int64) (ProfessionalInformation, error)
 	DeleteProfessionalUser(ctx context.Context, id int64) (ProfessionalUser, error)
@@ -23,6 +25,7 @@ type Querier interface {
 	DeleteStudentUser(ctx context.Context, id int64) (StudentUser, error)
 	DeleteSubjectMatter(ctx context.Context, id int64) (SubjectMatter, error)
 	DeleteSubjectMatterClass(ctx context.Context, id int64) (SubjectMatterClass, error)
+	GetAvailability(ctx context.Context, id int64) (Availability, error)
 	GetPhone(ctx context.Context, id int64) (Phone, error)
 	GetProfessionalInformation(ctx context.Context, id int64) (ProfessionalInformation, error)
 	GetProfessionalUser(ctx context.Context, username string) (ProfessionalUser, error)
@@ -30,6 +33,7 @@ type Querier interface {
 	GetStudentUser(ctx context.Context, username string) (StudentUser, error)
 	GetSubjectMatter(ctx context.Context, id int64) (SubjectMatter, error)
 	GetSubjectMatterClass(ctx context.Context, id int64) (SubjectMatterClass, error)
+	ListAvailability(ctx context.Context, arg ListAvailabilityParams) ([]Availability, error)
 	ListPhone(ctx context.Context, arg ListPhoneParams) ([]Phone, error)
 	ListProfessionalInformation(ctx context.Context, arg ListProfessionalInformationParams) ([]ProfessionalInformation, error)
 	ListProfessionalInformationByUser(ctx context.Context, professionalUserID int64) ([]ProfessionalInformation, error)

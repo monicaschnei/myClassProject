@@ -100,9 +100,10 @@ CREATE TABLE "phone" (
 
 CREATE TABLE "availability" (
     "id" bigserial PRIMARY KEY NOT NULL,
+    "date" varchar NOT NULL,
     "start" varchar NOT NULL,
-    "end" varchar NOT NULL,
-    "is_available" varchar NOT NULL,
+    "end_time" varchar NOT NULL,
+    "is_available" boolean NOT NULL,
     "user_id" bigint UNIQUE NOT NULL,
     "username" varchar UNIQUE NOT NULL
 );

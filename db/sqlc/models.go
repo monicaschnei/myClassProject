@@ -8,6 +8,16 @@ import (
 	"time"
 )
 
+type Availability struct {
+	ID          int64  `json:"id"`
+	Date        string `json:"date"`
+	Start       string `json:"start"`
+	EndTime     string `json:"end_time"`
+	IsAvailable bool   `json:"is_available"`
+	UserID      int64  `json:"user_id"`
+	Username    string `json:"username"`
+}
+
 type Phone struct {
 	ID          int64     `json:"id"`
 	CountryCode int32     `json:"country_code"`

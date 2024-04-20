@@ -1,7 +1,7 @@
 package api
 
+// import (
 //
-//import (
 //	"database/sql"
 //	"errors"
 //	"fmt"
@@ -14,153 +14,153 @@ package api
 //
 //	"github.com/gin-gonic/gin"
 //	_ "github.com/lib/pq"
-//)
 //
-//type createProfessionalUserRequest struct {
-//	Name           string `json:"name" binding:"required"`
-//	Username       string `json:"username" binding:"required,alphanum"`
-//	Password       string `json:"password" binding:"required,min=8,passwd"`
-//	Gender         string `json:"gender" binding:"required,gender"`
-//	Email          string `json:"email" binding:"required,email"`
-//	DateOfBirth    string `json:"date_of_birth"`
-//	Cpf            string `json:"cpf"`
-//	ClassHourPrice string `json:"class_hour_price"`
-//	ImageID        int64  `json:"image_id"`
-//}
+// )
 //
-//type professionalUserResponse struct {
-//	Name              string    `json:"name"`
-//	Username          string    `json:"username"`
-//	Gender            string    `json:"gender"`
-//	Email             string    `json:"email"`
-//	DateOfBirth       time.Time `json:"date_of_birth"`
-//	Cpf               string    `json:"cpf"`
-//	ClassHourPrice    string    `json:"class_hour_price"`
-//	ImageID           int64     `json:"image_id"`
-//	CreatedAt         time.Time `json:"createdAt"`
-//	PasswordChangedAt time.Time `json:"passwordChangedAt"`
-//}
-//
-//func newProfessionalUserResponse(professionalUser db.ProfessionalUser) professionalUserResponse {
-//	return professionalUserResponse{
-//		Name:              professionalUser.Name,
-//		Username:          professionalUser.Username,
-//		Gender:            professionalUser.Gender,
-//		Email:             professionalUser.Email,
-//		DateOfBirth:       professionalUser.DateOfBirth,
-//		Cpf:               professionalUser.Cpf,
-//		ClassHourPrice:    professionalUser.ClassHourPrice,
-//		ImageID:           professionalUser.ImageID,
-//		CreatedAt:         professionalUser.CreatedAt,
-//		PasswordChangedAt: professionalUser.PasswordChangedAt,
-//	}
-//}
-//
-//func (server *Server) createProfessionalUser(ctx *gin.Context) {
-//	var req createProfessionalUserRequest
-//	if err := ctx.ShouldBindJSON(&req); err != nil {
-//		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-//		return
+//	type createProfessionalUserRequest struct {
+//		Name           string `json:"name" binding:"required"`
+//		Username       string `json:"username" binding:"required,alphanum"`
+//		Password       string `json:"password" binding:"required,min=8,passwd"`
+//		Gender         string `json:"gender" binding:"required,gender"`
+//		Email          string `json:"email" binding:"required,email"`
+//		DateOfBirth    string `json:"date_of_birth"`
+//		Cpf            string `json:"cpf"`
+//		ClassHourPrice string `json:"class_hour_price"`
+//		ImageID        int64  `json:"image_id"`
 //	}
 //
-//	hashedPassword, err := util.HashPassword(req.Password)
-//	if err != nil {
-//		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-//		return
+//	type professionalUserResponse struct {
+//		Name              string    `json:"name"`
+//		Username          string    `json:"username"`
+//		Gender            string    `json:"gender"`
+//		Email             string    `json:"email"`
+//		DateOfBirth       time.Time `json:"date_of_birth"`
+//		Cpf               string    `json:"cpf"`
+//		ClassHourPrice    string    `json:"class_hour_price"`
+//		ImageID           int64     `json:"image_id"`
+//		CreatedAt         time.Time `json:"createdAt"`
+//		PasswordChangedAt time.Time `json:"passwordChangedAt"`
 //	}
 //
-//	dateOfBirth, err := time.Parse("2006-01-02", req.DateOfBirth)
-//	if err != nil {
-//		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-//		return
+//	func newProfessionalUserResponse(professionalUser db.ProfessionalUser) professionalUserResponse {
+//		return professionalUserResponse{
+//			Name:              professionalUser.Name,
+//			Username:          professionalUser.Username,
+//			Gender:            professionalUser.Gender,
+//			Email:             professionalUser.Email,
+//			DateOfBirth:       professionalUser.DateOfBirth,
+//			Cpf:               professionalUser.Cpf,
+//			ClassHourPrice:    professionalUser.ClassHourPrice,
+//			ImageID:           professionalUser.ImageID,
+//			CreatedAt:         professionalUser.CreatedAt,
+//			PasswordChangedAt: professionalUser.PasswordChangedAt,
+//		}
 //	}
 //
-//	if validCpf, err := cpf.Valid(req.Cpf); !validCpf {
+//	func (server *Server) createProfessionalUser(ctx *gin.Context) {
+//		var req createProfessionalUserRequest
+//		if err := ctx.ShouldBindJSON(&req); err != nil {
+//			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+//			return
+//		}
+//
+//		hashedPassword, err := util.HashPassword(req.Password)
 //		if err != nil {
 //			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 //			return
 //		}
-//		ctx.JSON(http.StatusBadRequest, fmt.Errorf("Invalid cpf"))
-//		return
+//
+//		dateOfBirth, err := time.Parse("2006-01-02", req.DateOfBirth)
+//		if err != nil {
+//			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+//			return
+//		}
+//
+//		if validCpf, err := cpf.Valid(req.Cpf); !validCpf {
+//			if err != nil {
+//				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+//				return
+//			}
+//			ctx.JSON(http.StatusBadRequest, fmt.Errorf("Invalid cpf"))
+//			return
+//		}
+//
+//		arg := db.CreateProfessionalUserParams{
+//			Name:           req.Name,
+//			Username:       req.Username,
+//			HashedPassword: hashedPassword,
+//			Gender:         req.Gender,
+//			Email:          req.Email,
+//			DateOfBirth:    dateOfBirth,
+//			Cpf:            req.Cpf,
+//			ImageID:        req.ImageID,
+//			UpdatedAt:      time.Now(),
+//			ClassHourPrice: req.ClassHourPrice,
+//		}
+//
+//		professionalUser, err := server.store.CreateProfessionalUser(ctx, arg)
+//		if err != nil {
+//			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+//			return
+//		}
+//
+//		response := newProfessionalUserResponse(professionalUser)
+//
+//		ctx.JSON(http.StatusOK, response)
 //	}
 //
-//	arg := db.CreateProfessionalUserParams{
-//		Name:           req.Name,
-//		Username:       req.Username,
-//		HashedPassword: hashedPassword,
-//		Gender:         req.Gender,
-//		Email:          req.Email,
-//		DateOfBirth:    dateOfBirth,
-//		Cpf:            req.Cpf,
-//		ImageID:        req.ImageID,
-//		UpdatedAt:      time.Now(),
-//		ClassHourPrice: req.ClassHourPrice,
+//	type getProfissionalUserRequest struct {
+//		UserName string `uri:"username" binding:"required"`
 //	}
 //
-//	professionalUser, err := server.store.CreateProfessionalUser(ctx, arg)
-//	if err != nil {
-//		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-//		return
+//	func (server *Server) getProfessionalUserById(ctx *gin.Context) {
+//		var req getProfissionalUserRequest
+//		if err := ctx.ShouldBindUri(&req); err != nil {
+//			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+//			return
+//		}
+//		professionalUser, err := server.store.GetProfessionalUser(ctx, req.UserName)
+//		if err != nil {
+//			fmt.Println(err)
+//			ctx.JSON(http.StatusNotFound, "This user does not exists, please create it firstly")
+//			return
+//		}
+//		ctx.JSON(http.StatusOK, professionalUser)
 //	}
 //
-//	response := newProfessionalUserResponse(professionalUser)
-//
-//	ctx.JSON(http.StatusOK, response)
-//}
-//
-//type getProfissionalUserRequest struct {
-//	UserName string `uri:"username" binding:"required"`
-//}
-//
-//func (server *Server) getProfessionalUserById(ctx *gin.Context) {
-//	var req getProfissionalUserRequest
-//	if err := ctx.ShouldBindUri(&req); err != nil {
-//		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-//		return
-//	}
-//	professionalUser, err := server.store.GetProfessionalUser(ctx, req.UserName)
-//	if err != nil {
-//		fmt.Println(err)
-//		ctx.JSON(http.StatusNotFound, "This user does not exists, please create it firstly")
-//		return
-//	}
-//	ctx.JSON(http.StatusOK, professionalUser)
-//}
-//
-//type listProfessionalUsersRequest struct {
-//	PageID   int32 `form:"page_id" binding:"required,min=1"`
-//	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
-//}
-//
-//func (server *Server) listAllProfessionalUsers(ctx *gin.Context) {
-//	var req listProfessionalUsersRequest
-//	if err := ctx.ShouldBindQuery(&req); err != nil {
-//		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-//		return
+//	type listProfessionalUsersRequest struct {
+//		PageID   int32 `form:"page_id" binding:"required,min=1"`
+//		PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 //	}
 //
-//	arg := db.ListProfessionalUserParams{
-//		Limit:  req.PageSize,
-//		Offset: (req.PageID - 1) * req.PageSize,
+//	func (server *Server) listAllProfessionalUsers(ctx *gin.Context) {
+//		var req listProfessionalUsersRequest
+//		if err := ctx.ShouldBindQuery(&req); err != nil {
+//			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+//			return
+//		}
+//
+//		arg := db.ListProfessionalUserParams{
+//			Limit:  req.PageSize,
+//			Offset: (req.PageID - 1) * req.PageSize,
+//		}
+//
+//		professionalUsers, err := server.store.ListProfessionalUser(ctx, arg)
+//		if err != nil {
+//			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+//			return
+//		}
+//		ctx.JSON(http.StatusOK, professionalUsers)
 //	}
 //
-//	professionalUsers, err := server.store.ListProfessionalUser(ctx, arg)
-//	if err != nil {
-//		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-//		return
+//	type updateProfessionalUser struct {
+//		Name           string `json:"name"`
+//		Username       string `json:"username"`
+//		Password       string `json:"password"`
+//		Email          string `json:"email"`
+//		DateOfBirth    string `json:"date_of_birth"`
+//		ClassHourPrice string `json:"class_hour_price"`
 //	}
-//	ctx.JSON(http.StatusOK, professionalUsers)
-//}
-//
-//type updateProfessionalUser struct {
-//	Name           string `json:"name"`
-//	Username       string `json:"username"`
-//	Password       string `json:"password"`
-//	Email          string `json:"email"`
-//	DateOfBirth    string `json:"date_of_birth"`
-//	ClassHourPrice string `json:"class_hour_price"`
-//}
-//
 //func (server *Server) updateProfessionalUser(ctx *gin.Context) {
 //	var req updateProfessionalUser
 //	var reqID getProfissionalUserRequest
@@ -211,6 +211,7 @@ package api
 //
 //	ctx.JSON(http.StatusOK, professionalUserUpdated)
 //}
+
 //
 //func (server *Server) deleteProfessionalUser(ctx *gin.Context) {
 //	var reqID getProfissionalUserRequest

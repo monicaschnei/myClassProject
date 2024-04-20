@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"database/sql"
@@ -7,19 +7,21 @@ import (
 	"github.com/mvrilo/go-cpf"
 	"myclass/api"
 	db "myclass/db/sqlc"
-	"myclass/internal/core/model/request"
-	"myclass/internal/core/model/response"
-	"myclass/internal/core/port/service"
+	"myclass/internal/core/domain/request"
+	"myclass/internal/core/domain/response"
+	"myclass/internal/core/port/usecase"
+	"myclass/token"
 	"myclass/util"
 	"time"
 )
 
+// usecase
 type professionalUserService struct {
 	userRepo db.Store
 	server   api.HttpServer
 }
 
-func NewProfessionalUserService(userRepo db.Store, server api.HttpServer) service.ProfessionalUserService {
+func NewProfessionalUserService(userRepo db.Store, server api.HttpServer) usecase.ProfessionalUserService {
 	return &professionalUserService{
 		userRepo: userRepo,
 		server:   server,
@@ -92,6 +94,50 @@ func (pus professionalUserService) LoginProfessionalUser(ctx *gin.Context, reque
 
 	response := pus.NewProfesionalUserLoginResponse(accesToken, professionalUser)
 	return response, nil
+}
+
+func (pus professionalUserService) ListProfessionalUser(ctx *gin.Context, request *request.ListProfessionalUsersRequest) ([]db.ProfessionalUser, error) {
+	listParams := db.ListProfessionalUserParams{
+		Limit:  request.PageSize,
+		Offset: (request.PageID - 1) * request.PageSize,
+	}
+	professionalUserList, err := pus.userRepo.ListProfessionalUser(ctx, listParams)
+	if err != nil {
+		return []db.ProfessionalUser{}, fmt.Errorf("Could not find the list of all professional users")
+	}
+	return professionalUserList, nil
+}
+
+func (pus professionalUserService) UpdateProfessionalUser(ctx *gin.Context, authPayload *token.Payload, username string, request *request.UpdateProfessionalUserRequest) (response.ProfessionalUserResponse, error) {
+	professionalUser, err := pus.GetProfessionalUser(ctx, username)
+	if err != nil {
+		return response.ProfessionalUserResponse{}, fmt.Errorf("This user does not exists, please create it firstly")
+	}
+	dateOfBirth, err := util.TransformDateOfBirth("2006-01-02", request.DateOfBirth)
+	if err != nil {
+		return response.ProfessionalUserResponse{}, err
+	}
+
+	arg := db.UpdateProfessionalUserParams{
+		ID:             professionalUser.ID,
+		Name:           request.Name,
+		Username:       request.Username,
+		HashedPassword: request.Password,
+		Email:          request.Email,
+		DateOfBirth:    dateOfBirth,
+		ClassHourPrice: request.ClassHourPrice,
+	}
+	professionalUserUpdated, err := pus.userRepo.UpdateProfessionalUser(ctx, arg)
+	if err != nil {
+		return response.ProfessionalUserResponse{}, fmt.Errorf("Could not update this user")
+	}
+
+	if professionalUser.Username != authPayload.Username {
+		err := fmt.Errorf("Account does not belong to the authenticated user")
+		return response.ProfessionalUserResponse{}, err
+	}
+
+	return response.NewProfessionalUserResponse(professionalUserUpdated), nil
 }
 
 func (pus professionalUserService) NewProfesionalUserLoginResponse(acessToken string, professionalUser db.ProfessionalUser) response.LoginProfessionalUserResponse {

@@ -13,7 +13,6 @@ const (
 	authorizationHeaderKey   = "authorization"
 	authorizationTypeBearer  = "bearer"
 	authorizatiionPayloadKey = "authorization_payload"
-	ab                        = "a"
 )
 
 func AuthMiddleware(tokenMaker token.Maker) gin.HandlerFunc {

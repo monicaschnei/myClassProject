@@ -26,6 +26,20 @@ type LoginProfessionalUserRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+type ListProfessionalUsersRequest struct {
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+}
+
+type UpdateProfessionalUserRequest struct {
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	Password       string `json:"password"`
+	Email          string `json:"email"`
+	DateOfBirth    string `json:"date_of_birth"`
+	ClassHourPrice string `json:"class_hour_price"`
+}
+
 func (pur CreateProfessionalUserRequest) CreateProfessionalUserRequestValidator() (*validator.Validate, error) {
 	validate := validator.New()
 	if err := validate.RegisterValidation("passwd", api.ValidPassword); err != nil {

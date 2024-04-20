@@ -9,3 +9,7 @@ func Post(router *gin.RouterGroup, path string, handler func(c *gin.Context)) {
 func Get(router *gin.RouterGroup, path string, handler func(c *gin.Context)) {
 	router.GET(path, handler)
 }
+
+func Put(router *gin.RouterGroup, path string, handler func(c *gin.Context)) {
+	router.PUT(path, handler)
+}
