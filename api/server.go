@@ -37,6 +37,7 @@ func NewServer(router *gin.Engine, config util.Config) HttpServer {
 			Addr:    fmt.Sprintf("%s:%d", defaultHost, config.Port),
 			Handler: router,
 		},
+		config: config,
 	}
 
 	//if v, ok := binding.Validator.Engine().(*validator.Validate); ok {

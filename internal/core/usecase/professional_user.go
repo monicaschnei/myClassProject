@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/mvrilo/go-cpf"
+	"log"
 	"myclass/api"
 	db "myclass/db/sqlc"
 	"myclass/internal/core/domain/request"
@@ -91,7 +92,12 @@ func (pus professionalUserService) LoginProfessionalUser(ctx *gin.Context, reque
 		professionalUser.Username,
 		pus.server.AccessTokenDuration(),
 	)
-
+	log.Printf("pus.server.AccessTokenDuration(),: %v", pus.server.AccessTokenDuration())
+	//session := &user.UserSession{
+	//	TokenAccess: accesToken,
+	//	User:        &professionalUser,
+	//}
+	//ctx.Set("session", session)
 	response := pus.NewProfesionalUserLoginResponse(accesToken, professionalUser)
 	return response, nil
 }

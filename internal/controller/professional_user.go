@@ -3,9 +3,9 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"myclass/api"
-	"myclass/internal/core/domain/request"
-	"myclass/internal/core/port/usecase"
-	"myclass/internal/infrastructure/router"
+	"myclass/internal/core/common/router"
+	"myclass/internal/core/model/request"
+	"myclass/internal/core/port/service"
 	"myclass/token"
 	"net/http"
 )
@@ -16,15 +16,16 @@ type ProfessionalUserController struct {
 	tokenMaker  token.Maker
 }
 
-func NewProfessionalUserController(gin *gin.Engine, userService usecase.ProfessionalUserService) ProfessionalUserController {
+func NewProfessionalUserController(gin *gin.Engine, userService service.ProfessionalUserService) ProfessionalUserController {
 	return ProfessionalUserController{
 		gin:         gin,
 		userService: userService,
+		tokenMaker:  maker,
 	}
 }
 func (u ProfessionalUserController) InitRouter() {
 	authApi := u.gin.Group("/")
-	authApi.Use(api.AuthMiddleware(u.tokenMaker))
+	authApi.Use(middleware.AuthMiddleware(u.tokenMaker))
 	api := u.gin.Group("/")
 
 	router.Post(api, "/professionalUser", u.createProfessionalUser)

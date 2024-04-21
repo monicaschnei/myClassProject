@@ -9,7 +9,7 @@ import (
 	"myclass/api"
 	db "myclass/db/sqlc"
 	"myclass/internal/controller"
-	"myclass/internal/core/usecase"
+	"myclass/internal/core/service"
 	"myclass/util"
 )
 
@@ -17,8 +17,8 @@ func main() {
 	// Create a new instance of the Gin router
 	instance := gin.New()
 	instance.Use(gin.Recovery())
-
 	config, err := util.LoadConfig(".")
+	tokenMaker, _ := token.NewPasetoMaker(config.AccesSymetryTokenKey)
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}
@@ -38,7 +38,6 @@ func main() {
 
 	//Cria Controller
 	professionalUserController := controller.NewProfessionalUserController(instance, professionalUserService)
-	availabilityProfessionalUserController := controller.NewAvailabilityProfessionalUserController(instance, professionalAvailabilityService)
 
 	//Inicializa as rotas do controller
 	professionalUserController.InitRouter()
